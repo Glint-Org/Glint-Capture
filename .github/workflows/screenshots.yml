@@ -1,0 +1,45 @@
+name: Telor Screenshots
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  capture-screenshots:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: example
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: kuhnroyal/flutter-fvm-config-action@v2
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run unit tests
+        run: flutter test test/widget_test.dart
+
+      - name: Run golden screenshot tests
+        run: flutter test test/telor_screenshots_test.dart
+
+      - name: Generate screenshots
+        run: dart run telor_capture --app ExampleApp --output build/telor_screenshots
+
+      - name: Upload screenshot artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: telor-screenshots
+          path: example/build/telor_screenshots/
+          retention-days: 14
