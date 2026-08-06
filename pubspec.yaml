@@ -1,0 +1,27 @@
+name: telor_capture
+description: Device-free Flutter screenshot capture for Play Store and App Store assets.
+version: 0.1.0
+homepage: https://github.com/darkmintis/Telor-Capture
+repository: https://github.com/darkmintis/Telor-Capture
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  alchemist: ^0.14.0
+  meta: ^1.15.0
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+
+executables:
+  telor_capture:
