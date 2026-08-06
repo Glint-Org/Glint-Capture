@@ -1,0 +1,21 @@
+name: telor_capture_example
+description: Example app demonstrating telor_capture screenshot rules.
+publish_to: 'none'
+
+environment:
+  sdk: ^3.8.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  telor_capture:
+    path: ../
+  alchemist: ^0.14.0
+
+flutter:
+  uses-material-design: true
