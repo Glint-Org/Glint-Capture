@@ -1,0 +1,13 @@
+output/
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+.dart_tool/
+build/
+.pub/
+.packages
+
+# FVM Version Cache
+.fvm/
