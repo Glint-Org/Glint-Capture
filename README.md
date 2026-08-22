@@ -1,15 +1,15 @@
-# Telor Capture
+# Glint Capture
 
 Device-free Flutter screenshot capture for Play Store and App Store assets.
 
-Part of the [Telor](https://github.com/darkmintis/Telor-Org) ecosystem.
+Part of the [Glint](https://github.com/darkmintis/Glint-Org) ecosystem.
 
 ## Features
 
 - Capture screenshots from code — no emulator or physical device
 - Declarative rules API with custom and template-based flows
 - Multi-device presets (Pixel 7, Galaxy S23, iPhone 15, iPad Pro)
-- Outputs PNGs + `session.json` for Telor-Web import
+- Outputs PNGs + `session.json` for Glint-Web import
 - Built on [alchemist](https://pub.dev/packages/alchemist) golden testing
 
 ## Quick Start
@@ -17,28 +17,28 @@ Part of the [Telor](https://github.com/darkmintis/Telor-Org) ecosystem.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  telor_capture:
-    path: ../Telor-Capture  # or from pub.dev when published
+  glint_capture:
+    path: ../Glint-Capture  # or from pub.dev when published
 ```
 
 ```dart
-// test/telor_screenshots_test.dart
+// test/glint_screenshots_test.dart
 import 'package:flutter/material.dart';
-import 'package:telor_capture/telor_capture.dart';
+import 'package:glint_capture/glint_capture.dart';
 
 void main() {
-  telorScreenshots(
+  glintScreenshots(
     appName: 'MyApp',
     tagline: 'Edit photos like a pro',
-    devices: TelorDevices.playStoreDefaults,
+    devices: GLINTDevices.playStoreDefaults,
     rules: [
-      TelorRule.screen(
+      GLINTRule.screen(
         name: 'home',
         builder: (context) => const Scaffold(
           body: Center(child: Text('Home Screen')),
         ),
       ),
-      TelorRule.screen(
+      GLINTRule.screen(
         name: 'profile',
         builder: (context) => const Scaffold(
           body: Center(child: Text('Profile Screen')),
@@ -50,18 +50,18 @@ void main() {
 ```
 
 ```bash
-dart run telor_capture --app MyApp --output build/telor_screenshots
+dart run glint_capture --app MyApp --output build/glint_screenshots
 ```
 
-Import `build/telor_screenshots/` into Telor-Web to apply viral templates and export store-ready assets.
+Import `build/glint_screenshots/` into Glint-Web to apply viral templates and export store-ready assets.
 
 ## CLI
 
 ```
-dart run telor_capture [options]
+dart run glint_capture [options]
 
-  --test <path>       Test file (default: test/telor_screenshots_test.dart)
-  -o, --output <dir>  Output directory (default: build/telor_screenshots)
+  --test <path>       Test file (default: test/glint_screenshots_test.dart)
+  -o, --output <dir>  Output directory (default: build/glint_screenshots)
   -a, --app <name>    App name for session.json
   -t, --tagline       Marketing tagline
   --store play|ios    Store target
@@ -79,7 +79,7 @@ dart run telor_capture [options]
 ## Template Rules
 
 ```dart
-TelorRule.template(
+GLINTRule.template(
   name: 'onboarding_flow',
   screens: ['welcome', 'features', 'signup'],
   builders: {
@@ -96,11 +96,11 @@ Built-in templates: `onboarding_flow`, `feature_highlights`, `settings_profile`.
 
 ```yaml
 # .github/workflows/screenshots.yml
-- run: dart run telor_capture --app ${{ env.APP_NAME }}
+- run: dart run glint_capture --app ${{ env.APP_NAME }}
 - uses: actions/upload-artifact@v4
   with:
-    name: telor-screenshots
-    path: build/telor_screenshots/
+    name: glint-screenshots
+    path: build/glint_screenshots/
 ```
 
 ## License

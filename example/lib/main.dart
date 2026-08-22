@@ -10,7 +10,7 @@ class ExampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Telor Capture Example',
+      title: 'Glint Capture Example',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -72,7 +72,10 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: const [
-          ListTile(leading: Icon(Icons.notifications), title: Text('Notifications')),
+          ListTile(
+            leading: Icon(Icons.notifications),
+            title: Text('Notifications'),
+          ),
           ListTile(leading: Icon(Icons.dark_mode), title: Text('Dark Mode')),
           ListTile(leading: Icon(Icons.language), title: Text('Language')),
         ],

@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
-/// Writes a Telor session JSON file compatible with Telor-Web and Telor-View.
-class TelorSession {
-  TelorSession({
+/// Writes a Glint session JSON file compatible with Glint-Web and Glint-View.
+class GLINTSession {
+  GLINTSession({
     required this.app,
     required this.screens,
     this.tagline,
@@ -22,16 +22,17 @@ class TelorSession {
   final DateTime exportedAt;
 
   Map<String, dynamic> toJson() => {
-        'app': app,
-        if (tagline != null) 'tagline': tagline,
-        'screens': screens,
-        'store': store,
-        'version': version,
-        'exportedAt': exportedAt.toIso8601String(),
-      };
+    'app': app,
+    if (tagline != null) 'tagline': tagline,
+    'screens': screens,
+    'store': store,
+    'version': version,
+    'exportedAt': exportedAt.toIso8601String(),
+  };
 
-  String toJsonString({bool pretty = true}) =>
-      pretty ? const JsonEncoder.withIndent('  ').convert(toJson()) : jsonEncode(toJson());
+  String toJsonString({bool pretty = true}) => pretty
+      ? const JsonEncoder.withIndent('  ').convert(toJson())
+      : jsonEncode(toJson());
 
   /// Write session.json to [outputDir].
   Future<File> write(String outputDir) async {
@@ -45,7 +46,7 @@ class TelorSession {
   }
 
   /// Build session from PNG files in [outputDir] (filenames only, not full paths).
-  static TelorSession fromDirectory({
+  static GLINTSession fromDirectory({
     required String outputDir,
     required String appName,
     String? tagline,
@@ -56,15 +57,16 @@ class TelorSession {
       throw StateError('Output directory does not exist: $outputDir');
     }
 
-    final screens = dir
-        .listSync()
-        .whereType<File>()
-        .where((f) => p.extension(f.path).toLowerCase() == '.png')
-        .map((f) => p.basename(f.path))
-        .toList()
-      ..sort();
+    final screens =
+        dir
+            .listSync()
+            .whereType<File>()
+            .where((f) => p.extension(f.path).toLowerCase() == '.png')
+            .map((f) => p.basename(f.path))
+            .toList()
+          ..sort();
 
-    return TelorSession(
+    return GLINTSession(
       app: appName,
       tagline: tagline,
       screens: screens,

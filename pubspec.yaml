@@ -1,8 +1,8 @@
-name: telor_capture
+name: glint_capture
 description: Device-free Flutter screenshot capture for Play Store and App Store assets.
 version: 0.1.0
-homepage: https://github.com/darkmintis/Telor-Capture
-repository: https://github.com/darkmintis/Telor-Capture
+homepage: https://github.com/darkmintis/Glint-Capture
+repository: https://github.com/darkmintis/Glint-Capture
 
 environment:
   sdk: ^3.8.0
@@ -24,4 +24,4 @@ flutter:
   uses-material-design: true
 
 executables:
-  telor_capture:
+  glint_capture:

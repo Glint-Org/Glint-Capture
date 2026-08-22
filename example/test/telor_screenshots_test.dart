@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:telor_capture/telor_capture.dart';
+import 'package:glint_capture/glint_capture.dart';
 
 import '../lib/main.dart' as app;
 
 void main() {
-  telorScreenshots(
+  glintScreenshots(
     appName: 'ExampleApp',
     tagline: 'Screenshot automation made easy',
-    outputDir: 'build/telor_screenshots',
-    devices: TelorDevices.playStoreDefaults,
+    outputDir: 'build/glint_screenshots',
+    devices: GLINTDevices.playStoreDefaults,
     rules: [
-      TelorRule.screen(
+      GLINTRule.screen(
         name: 'home',
         builder: (context) => const MaterialApp(home: app.HomeScreen()),
       ),
-      TelorRule.screen(
+      GLINTRule.screen(
         name: 'profile',
         builder: (context) => const MaterialApp(home: app.ProfileScreen()),
       ),
-      TelorRule.screen(
+      GLINTRule.screen(
         name: 'settings',
         builder: (context) => const MaterialApp(home: app.SettingsScreen()),
       ),

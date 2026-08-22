@@ -3,42 +3,42 @@ import 'package:flutter/widgets.dart';
 import 'pump.dart';
 
 /// A declarative screenshot capture rule.
-sealed class TelorRule {
-  const TelorRule({required this.name});
+sealed class GLINTRule {
+  const GLINTRule({required this.name});
 
   final String name;
 
   /// Capture a single screen widget.
-  factory TelorRule.screen({
+  factory GLINTRule.screen({
     required String name,
     required WidgetBuilder builder,
-    TelorPumpFn? pump,
+    GLINTPumpFn? pump,
     Widget? wrapper,
-  }) = TelorScreenRule;
+  }) = GLINTScreenRule;
 
   /// Expand a built-in template into multiple screen rules.
-  factory TelorRule.template({
+  factory GLINTRule.template({
     required String name,
     required List<String> screens,
     Map<String, WidgetBuilder>? builders,
-  }) = TelorTemplateRule;
+  }) = GLINTTemplateRule;
 }
 
-class TelorScreenRule extends TelorRule {
-  TelorScreenRule({
+class GLINTScreenRule extends GLINTRule {
+  GLINTScreenRule({
     required super.name,
     required this.builder,
-    TelorPumpFn? pump,
+    GLINTPumpFn? pump,
     this.wrapper,
-  }) : pump = pump ?? TelorPump.settle;
+  }) : pump = pump ?? GLINTPump.settle;
 
   final WidgetBuilder builder;
-  final TelorPumpFn pump;
+  final GLINTPumpFn pump;
   final Widget? wrapper;
 }
 
-class TelorTemplateRule extends TelorRule {
-  const TelorTemplateRule({
+class GLINTTemplateRule extends GLINTRule {
+  const GLINTTemplateRule({
     required super.name,
     required this.screens,
     this.builders,
@@ -49,12 +49,30 @@ class TelorTemplateRule extends TelorRule {
 }
 
 /// Built-in template presets that map to common store screenshot flows.
-abstract final class TelorTemplates {
-  static const onboardingFlow = ['welcome', 'features', 'permissions', 'signup', 'home'];
+abstract final class GLINTTemplates {
+  static const onboardingFlow = [
+    'welcome',
+    'features',
+    'permissions',
+    'signup',
+    'home',
+  ];
 
-  static const featureHighlights = ['home', 'search', 'detail', 'profile', 'settings'];
+  static const featureHighlights = [
+    'home',
+    'search',
+    'detail',
+    'profile',
+    'settings',
+  ];
 
-  static const settingsProfile = ['home', 'settings', 'profile', 'notifications', 'about'];
+  static const settingsProfile = [
+    'home',
+    'settings',
+    'profile',
+    'notifications',
+    'about',
+  ];
 
   /// Resolves a template name to screen identifiers.
   static List<String> resolve(String templateName) {
@@ -68,20 +86,20 @@ abstract final class TelorTemplates {
 }
 
 /// Expands template rules into concrete screen rules using provided builders.
-List<TelorScreenRule> expandRules(List<TelorRule> rules) {
-  final expanded = <TelorScreenRule>[];
+List<GLINTScreenRule> expandRules(List<GLINTRule> rules) {
+  final expanded = <GLINTScreenRule>[];
   for (final rule in rules) {
     switch (rule) {
-      case TelorScreenRule():
+      case GLINTScreenRule():
         expanded.add(rule);
-      case TelorTemplateRule template:
+      case GLINTTemplateRule template:
         final names = template.screens.isNotEmpty
             ? template.screens
-            : TelorTemplates.resolve(template.name);
+            : GLINTTemplates.resolve(template.name);
         for (final screenName in names) {
           final builder = template.builders?[screenName];
           if (builder != null) {
-            expanded.add(TelorScreenRule(name: screenName, builder: builder));
+            expanded.add(GLINTScreenRule(name: screenName, builder: builder));
           }
         }
     }

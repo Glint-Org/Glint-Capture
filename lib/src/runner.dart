@@ -6,13 +6,13 @@ import 'devices.dart';
 import 'pump.dart';
 import 'rules.dart';
 
-/// Configuration for a telor screenshot test suite.
-class TelorScreenshotConfig {
-  const TelorScreenshotConfig({
+/// Configuration for a glint screenshot test suite.
+class GLINTScreenshotConfig {
+  const GLINTScreenshotConfig({
     required this.appName,
     this.tagline,
-    this.outputDir = 'build/telor_screenshots',
-    this.devices = TelorDevices.playStoreDefaults,
+    this.outputDir = 'build/glint_screenshots',
+    this.devices = GLINTDevices.playStoreDefaults,
     required this.rules,
     this.theme,
     this.store = 'play',
@@ -21,25 +21,25 @@ class TelorScreenshotConfig {
   final String appName;
   final String? tagline;
   final String outputDir;
-  final List<TelorDevice> devices;
-  final List<TelorRule> rules;
+  final List<GLINTDevice> devices;
+  final List<GLINTRule> rules;
   final ThemeData? theme;
   final String store;
 }
 
 /// Registers golden screenshot tests for each rule × device combination.
 ///
-/// Run with: `flutter test test/telor_screenshots_test.dart --update-goldens`
-void telorScreenshots({
+/// Run with: `flutter test test/glint_screenshots_test.dart --update-goldens`
+void glintScreenshots({
   required String appName,
   String? tagline,
-  String outputDir = 'build/telor_screenshots',
-  List<TelorDevice> devices = TelorDevices.playStoreDefaults,
-  required List<TelorRule> rules,
+  String outputDir = 'build/glint_screenshots',
+  List<GLINTDevice> devices = GLINTDevices.playStoreDefaults,
+  required List<GLINTRule> rules,
   ThemeData? theme,
   String store = 'play',
 }) {
-  final config = TelorScreenshotConfig(
+  final config = GLINTScreenshotConfig(
     appName: appName,
     tagline: tagline,
     outputDir: outputDir,
@@ -49,30 +49,28 @@ void telorScreenshots({
     store: store,
   );
 
-  TelorRunner(config).registerTests();
+  GLINTRunner(config).registerTests();
 }
 
 /// Orchestrates alchemist golden test registration and post-processing.
-class TelorRunner {
-  TelorRunner(this.config);
+class GLINTRunner {
+  GLINTRunner(this.config);
 
-  final TelorScreenshotConfig config;
+  final GLINTScreenshotConfig config;
 
   void registerTests() {
     final screenRules = expandRules(config.rules);
     if (screenRules.isEmpty) {
-      throw StateError('No screenshot rules defined. Add TelorRule.screen() entries.');
+      throw StateError(
+        'No screenshot rules defined. Add GLINTRule.screen() entries.',
+      );
     }
 
     AlchemistConfig.runWithConfig(
       config: AlchemistConfig(
         theme: config.theme ?? ThemeData.light(useMaterial3: true),
-        platformGoldensConfig: const PlatformGoldensConfig(
-          enabled: true,
-        ),
-        ciGoldensConfig: const CiGoldensConfig(
-          enabled: true,
-        ),
+        platformGoldensConfig: const PlatformGoldensConfig(enabled: true),
+        ciGoldensConfig: const CiGoldensConfig(enabled: true),
       ),
       run: () {
         for (final rule in screenRules) {
@@ -122,13 +120,13 @@ class TelorRunner {
 }
 
 /// Helper to pump a widget with custom timing before golden capture.
-Future<void> telorPumpWidget(
+Future<void> glintPumpWidget(
   WidgetTester tester,
   Widget widget, {
-  TelorPumpFn? pump,
-  TelorDevice? device,
+  GLINTPumpFn? pump,
+  GLINTDevice? device,
 }) async {
-  final effectivePump = pump ?? TelorPump.settle;
+  final effectivePump = pump ?? GLINTPump.settle;
   if (device != null) {
     await tester.binding.setSurfaceSize(device.size);
     tester.view.devicePixelRatio = device.devicePixelRatio;

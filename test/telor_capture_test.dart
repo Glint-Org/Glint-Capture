@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:telor_capture/telor_capture.dart';
+import 'package:glint_capture/glint_capture.dart';
 
 void main() {
-  group('TelorDevice', () {
+  group('GLINTDevice', () {
     test('playStoreDefaults contains android devices', () {
-      expect(TelorDevices.playStoreDefaults, hasLength(2));
-      expect(TelorDevices.playStoreDefaults.every((d) => d.platform == TelorPlatform.android), isTrue);
+      expect(GLINTDevices.playStoreDefaults, hasLength(2));
+      expect(
+        GLINTDevices.playStoreDefaults.every(
+          (d) => d.platform == GLINTPlatform.android,
+        ),
+        isTrue,
+      );
     });
 
     test('allDefaults includes four presets', () {
-      expect(TelorDevices.allDefaults, hasLength(4));
+      expect(GLINTDevices.allDefaults, hasLength(4));
     });
   });
 
-  group('TelorSession', () {
-    test('toJson matches Telor schema', () {
-      final session = TelorSession(
+  group('GLINTSession', () {
+    test('toJson matches Glint schema', () {
+      final session = GLINTSession(
         app: 'TestApp',
         tagline: 'Hello',
         screens: ['home_pixel7.png', 'profile_pixel7.png'],
@@ -36,17 +41,14 @@ void main() {
   group('expandRules', () {
     test('expands screen rules unchanged', () {
       final rules = [
-        TelorRule.screen(
-          name: 'home',
-          builder: (context) => const SizedBox(),
-        ),
+        GLINTRule.screen(name: 'home', builder: (context) => const SizedBox()),
       ];
       expect(expandRules(rules), hasLength(1));
     });
 
     test('expands template rules with builders', () {
       final rules = [
-        TelorRule.template(
+        GLINTRule.template(
           name: 'onboarding_flow',
           screens: ['welcome', 'signup'],
           builders: {
@@ -59,10 +61,10 @@ void main() {
     });
   });
 
-  group('TelorTemplates', () {
+  group('GLINTTemplates', () {
     test('resolve returns known templates', () {
-      expect(TelorTemplates.resolve('onboarding_flow'), hasLength(5));
-      expect(TelorTemplates.resolve('feature_highlights'), hasLength(5));
+      expect(GLINTTemplates.resolve('onboarding_flow'), hasLength(5));
+      expect(GLINTTemplates.resolve('feature_highlights'), hasLength(5));
     });
   });
 }

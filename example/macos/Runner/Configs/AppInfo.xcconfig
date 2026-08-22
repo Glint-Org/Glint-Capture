@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = telor_capture_example
+PRODUCT_NAME = glint_capture_example
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.telor.telorCaptureExample
+PRODUCT_BUNDLE_IDENTIFIER = com.glint.glintCaptureExample
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.telor. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.glint. All rights reserved.

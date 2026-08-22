@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.telor.telor_capture_example"
+    namespace = "com.glint.glint_capture_example"
     compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
@@ -14,7 +14,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.telor.telor_capture_example"
+        applicationId = "com.glint.glint_capture_example"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = flutter.versionCode

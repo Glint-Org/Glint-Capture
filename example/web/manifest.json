@@ -1,6 +1,6 @@
 {
-    "name": "telor_capture_example",
-    "short_name": "telor_capture_example",
+    "name": "glint_capture_example",
+    "short_name": "glint_capture_example",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

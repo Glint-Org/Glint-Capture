@@ -1,13 +1,13 @@
 /// Device-free Flutter screenshot capture for store-ready assets.
 ///
 /// ```dart
-/// import 'package:telor_capture/telor_capture.dart';
+/// import 'package:glint_capture/glint_capture.dart';
 ///
 /// void main() {
-///   telorScreenshots(
+///   glintScreenshots(
 ///     appName: 'MyApp',
 ///     rules: [
-///       TelorRule.screen(
+///       GLINTRule.screen(
 ///         name: 'home',
 ///         builder: (context) => const HomeScreen(),
 ///       ),
@@ -15,7 +15,7 @@
 ///   );
 /// }
 /// ```
-library telor_capture;
+library glint_capture;
 
 export 'src/devices.dart';
 export 'src/pump.dart';

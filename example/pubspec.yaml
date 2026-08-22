@@ -1,5 +1,5 @@
-name: telor_capture_example
-description: Example app demonstrating telor_capture screenshot rules.
+name: glint_capture_example
+description: Example app demonstrating glint_capture screenshot rules.
 publish_to: 'none'
 
 environment:
@@ -13,7 +13,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  telor_capture:
+  glint_capture:
     path: ../
   alchemist: ^0.14.0
 

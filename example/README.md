@@ -1,4 +1,4 @@
-# telor_capture_example
+# glint_capture_example
 
 A new Flutter project.
 

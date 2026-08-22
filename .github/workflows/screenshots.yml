@@ -1,4 +1,4 @@
-name: Telor Screenshots
+name: Glint Screenshots
 
 on:
   push:
@@ -32,14 +32,14 @@ jobs:
         run: flutter test test/widget_test.dart
 
       - name: Run golden screenshot tests
-        run: flutter test test/telor_screenshots_test.dart
+        run: flutter test test/glint_screenshots_test.dart
 
       - name: Generate screenshots
-        run: dart run telor_capture --app ExampleApp --output build/telor_screenshots
+        run: dart run glint_capture --app ExampleApp --output build/glint_screenshots
 
       - name: Upload screenshot artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: telor-screenshots
-          path: example/build/telor_screenshots/
+          name: glint-screenshots
+          path: example/build/glint_screenshots/
           retention-days: 14
