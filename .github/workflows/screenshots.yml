@@ -32,7 +32,7 @@ jobs:
         run: flutter test test/widget_test.dart
 
       - name: Run golden screenshot tests
-        run: flutter test test/glint_screenshots_test.dart
+        run: flutter test test/glint_screenshots_test.dart --update-goldens
 
       - name: Generate screenshots
         run: dart run glint_capture --app ExampleApp --output build/glint_screenshots
