@@ -1,6 +1,5 @@
 app_name: ExampleApp
 tagline: "Screenshot automation made easy"
-output: build/glint_screenshots
 store: play
 
 devices:

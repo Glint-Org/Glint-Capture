@@ -38,7 +38,7 @@ class GLINTConfig {
 
     final appName = doc['app_name'] as String? ?? 'MyApp';
     final tagline = doc['tagline'] as String?;
-    final outputDir = doc['output'] as String? ?? 'build/glint_screenshots';
+    final outputDir = doc['output'] as String? ?? 'glint_screenshots';
     final store = doc['store'] as String? ?? 'play';
 
     final devices = _parseDevices(doc['devices'], rootDir: rootDir);

@@ -13,7 +13,7 @@ class GLINTScreenshotConfig {
   const GLINTScreenshotConfig({
     required this.appName,
     this.tagline,
-    this.outputDir = 'build/glint_screenshots',
+    this.outputDir = 'glint_screenshots',
     this.devices = GLINTDevices.playStoreDefaults,
     required this.rules,
     this.theme,
@@ -46,7 +46,7 @@ class GLINTScreenshotConfig {
 void glintScreenshots({
   required String appName,
   String? tagline,
-  String outputDir = 'build/glint_screenshots',
+  String outputDir = 'glint_screenshots',
   List<GLINTDevice> devices = GLINTDevices.playStoreDefaults,
   required List<GLINTRule> rules,
   ThemeData? theme,

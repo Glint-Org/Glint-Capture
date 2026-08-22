@@ -7,7 +7,6 @@ void main() {
   glintScreenshots(
     appName: 'ExampleApp',
     tagline: 'Screenshot automation made easy',
-    outputDir: 'build/glint_screenshots',
     devices: GLINTDevices.playStoreDefaults,
     theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
     rules: [
