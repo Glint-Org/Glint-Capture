@@ -45,7 +45,20 @@ class GLINTSession {
     return file;
   }
 
-  /// Build session from PNG files in [outputDir] (filenames only, not full paths).
+  /// Build session by scanning the platform/device/screen output structure.
+  ///
+  /// Expected layout:
+  /// ```
+  /// outputDir/
+  /// ├── android/
+  /// │   ├── pixel7/
+  /// │   │   ├── home.png
+  /// │   │   └── profile.png
+  /// │   └── galaxy_s23/
+  /// │       └── ...
+  /// └── ios/
+  ///     └── ...
+  /// ```
   static GLINTSession fromDirectory({
     required String outputDir,
     required String appName,
@@ -57,14 +70,19 @@ class GLINTSession {
       throw StateError('Output directory does not exist: $outputDir');
     }
 
-    final screens =
-        dir
-            .listSync()
-            .whereType<File>()
-            .where((f) => p.extension(f.path).toLowerCase() == '.png')
-            .map((f) => p.basename(f.path))
-            .toList()
-          ..sort();
+    final screens = <String>[];
+    for (final platformDir in dir.listSync().whereType<Directory>()) {
+      for (final deviceDir in platformDir.listSync().whereType<Directory>()) {
+        for (final file in deviceDir.listSync().whereType<File>()) {
+          if (p.extension(file.path).toLowerCase() == '.png') {
+            screens.add(
+              '${p.basename(platformDir.path)}/${p.basename(deviceDir.path)}/${p.basename(file.path)}',
+            );
+          }
+        }
+      }
+    }
+    screens.sort();
 
     return GLINTSession(
       app: appName,
@@ -73,34 +91,4 @@ class GLINTSession {
       store: store,
     );
   }
-}
-
-/// Copies golden PNG files from [sourceDir] to [outputDir] with normalized names.
-Future<List<String>> copyGoldensToOutput({
-  required String sourceDir,
-  required String outputDir,
-  String prefix = '',
-}) async {
-  final source = Directory(sourceDir);
-  final dest = Directory(outputDir);
-  if (!await dest.exists()) {
-    await dest.create(recursive: true);
-  }
-
-  final copied = <String>[];
-  if (!await source.exists()) return copied;
-
-  for (final entity in source.listSync(recursive: true)) {
-    if (entity is! File) continue;
-    if (p.extension(entity.path).toLowerCase() != '.png') continue;
-
-    final baseName = p.basename(entity.path);
-    final destName = prefix.isEmpty ? baseName : '${prefix}_$baseName';
-    final destPath = p.join(outputDir, destName);
-    await entity.copy(destPath);
-    copied.add(destName);
-  }
-
-  copied.sort();
-  return copied;
 }

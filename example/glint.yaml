@@ -1,0 +1,16 @@
+app_name: ExampleApp
+tagline: "Screenshot automation made easy"
+output: build/glint_screenshots
+store: play
+
+devices:
+  - name: pixel7
+    width: 412
+    height: 915
+    device_pixel_ratio: 2.625
+    platform: android
+  - name: galaxy_s23
+    width: 360
+    height: 780
+    device_pixel_ratio: 3.0
+    platform: android

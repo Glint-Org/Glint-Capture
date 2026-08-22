@@ -63,6 +63,22 @@ class GLINTDevice {
     devicePixelRatio: 1.0,
     platform: GLINTPlatform.ios,
   );
+
+  /// Create a custom device with arbitrary dimensions.
+  factory GLINTDevice.custom({
+    required String name,
+    required double width,
+    required double height,
+    double devicePixelRatio = 1.0,
+    GLINTPlatform platform = GLINTPlatform.android,
+  }) {
+    return GLINTDevice(
+      name: name,
+      size: Size(width, height),
+      devicePixelRatio: devicePixelRatio,
+      platform: platform,
+    );
+  }
 }
 
 enum GLINTPlatform { android, ios }
@@ -79,4 +95,14 @@ abstract final class GLINTDevices {
     GLINTDevice.iphone15,
     GLINTDevice.ipadPro11,
   ];
+
+  /// Resolve a preset name to a device list.
+  static List<GLINTDevice> resolve(String preset) {
+    return switch (preset) {
+      'play_store' => playStoreDefaults,
+      'app_store' => appStoreDefaults,
+      'all' => allDefaults,
+      _ => throw ArgumentError('Unknown preset: $preset'),
+    };
+  }
 }

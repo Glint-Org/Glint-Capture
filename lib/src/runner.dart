@@ -1,10 +1,12 @@
-import 'package:alchemist/alchemist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
 
+import 'config.dart';
 import 'devices.dart';
 import 'pump.dart';
 import 'rules.dart';
+import 'screenshot.dart';
 
 /// Configuration for a glint screenshot test suite.
 class GLINTScreenshotConfig {
@@ -25,11 +27,22 @@ class GLINTScreenshotConfig {
   final List<GLINTRule> rules;
   final ThemeData? theme;
   final String store;
+
+  /// Build config from a glint.yaml file.
+  factory GLINTScreenshotConfig.fromYaml(String path) {
+    final yaml = GLINTConfig.load(path);
+    return GLINTScreenshotConfig(
+      appName: yaml.appName,
+      tagline: yaml.tagline,
+      outputDir: yaml.outputDir,
+      devices: yaml.devices,
+      rules: [],
+      store: yaml.store,
+    );
+  }
 }
 
-/// Registers golden screenshot tests for each rule × device combination.
-///
-/// Run with: `flutter test test/glint_screenshots_test.dart --update-goldens`
+/// Top-level entry point — registers screenshot capture tests.
 void glintScreenshots({
   required String appName,
   String? tagline,
@@ -52,7 +65,7 @@ void glintScreenshots({
   GLINTRunner(config).registerTests();
 }
 
-/// Orchestrates alchemist golden test registration and post-processing.
+/// Orchestrates screenshot capture test registration.
 class GLINTRunner {
   GLINTRunner(this.config);
 
@@ -66,60 +79,45 @@ class GLINTRunner {
       );
     }
 
-    AlchemistConfig.runWithConfig(
-      config: AlchemistConfig(
-        theme: config.theme ?? ThemeData.light(useMaterial3: true),
-        platformGoldensConfig: const PlatformGoldensConfig(enabled: true),
-        ciGoldensConfig: const CiGoldensConfig(enabled: true, obscureText: false),
-      ),
-      run: () {
-        for (final rule in screenRules) {
-          for (final device in config.devices) {
-            final fileName = '${rule.name}_${device.name}';
-            goldenTest(
-              '${rule.name} on ${device.name}',
-              fileName: fileName,
-              constraints: BoxConstraints(
-                maxWidth: device.size.width,
-                maxHeight: device.size.height,
-              ),
-              builder: () => GoldenTestGroup(
-                scenarioConstraints: BoxConstraints(
-                  maxWidth: device.size.width,
-                  maxHeight: device.size.height,
-                ),
-                children: [
-                  GoldenTestScenario(
-                    name: device.name,
-                    constraints: BoxConstraints(
-                      maxWidth: device.size.width,
-                      maxHeight: device.size.height,
-                    ),
-                    child: SizedBox(
-                      width: device.size.width,
-                      height: device.size.height,
-                      child: MediaQuery(
-                        data: MediaQueryData(
-                          size: device.size,
-                          devicePixelRatio: device.devicePixelRatio,
-                          textScaler: TextScaler.linear(device.textScale),
-                          platformBrightness: Brightness.light,
-                        ),
-                        child: Builder(builder: rule.builder),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    for (final rule in screenRules) {
+      for (final device in config.devices) {
+        testWidgets(
+          '${rule.name} on ${device.name}',
+          (tester) async {
+            final bytes = await GLINTScreenshot.capture(
+              tester: tester,
+              widget: config.theme != null
+                  ? MaterialApp(
+                      theme: config.theme,
+                      home: Builder(builder: rule.builder),
+                    )
+                  : Builder(builder: rule.builder),
+              size: device.size,
+              devicePixelRatio: device.devicePixelRatio,
             );
-          }
-        }
-      },
-    );
+
+            final platformDir = switch (device.platform) {
+              GLINTPlatform.android => 'android',
+              GLINTPlatform.ios => 'ios',
+            };
+            final outputPath = p.join(
+              config.outputDir,
+              platformDir,
+              device.name,
+              '${rule.name}.png',
+            );
+
+            await tester.runAsync(
+              () => GLINTScreenshot.save(bytes, outputPath),
+            );
+          },
+        );
+      }
+    }
   }
 }
 
-/// Helper to pump a widget with custom timing before golden capture.
+/// Helper to pump a widget with custom timing before screenshot capture.
 Future<void> glintPumpWidget(
   WidgetTester tester,
   Widget widget, {

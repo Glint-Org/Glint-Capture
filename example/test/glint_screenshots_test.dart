@@ -9,18 +9,19 @@ void main() {
     tagline: 'Screenshot automation made easy',
     outputDir: 'build/glint_screenshots',
     devices: GLINTDevices.playStoreDefaults,
+    theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
     rules: [
       GLINTRule.screen(
         name: 'home',
-        builder: (context) => const MaterialApp(home: app.HomeScreen()),
+        builder: (context) => const app.HomeScreen(),
       ),
       GLINTRule.screen(
         name: 'profile',
-        builder: (context) => const MaterialApp(home: app.ProfileScreen()),
+        builder: (context) => const app.ProfileScreen(),
       ),
       GLINTRule.screen(
         name: 'settings',
-        builder: (context) => const MaterialApp(home: app.SettingsScreen()),
+        builder: (context) => const app.SettingsScreen(),
       ),
     ],
   );
