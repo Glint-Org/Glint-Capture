@@ -30,11 +30,17 @@ Future<void> main(List<String> args) async {
   print('  Test:   $testFile');
   print('  Output: ${options.outputDir}');
 
-  final result = await Process.run('flutter', [
-    'test',
-    testFile,
-    '--update-goldens',
-  ], runInShell: true);
+  final ProcessResult result;
+  try {
+    result = await Process.run('flutter', [
+      'test',
+      testFile,
+      '--update-goldens',
+    ], runInShell: true);
+  } on ProcessException {
+    print('Error: Flutter not found. Install Flutter and ensure it is on PATH.');
+    exit(1);
+  }
 
   stdout.write(result.stdout);
   stderr.write(result.stderr);

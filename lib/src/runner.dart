@@ -70,7 +70,7 @@ class GLINTRunner {
       config: AlchemistConfig(
         theme: config.theme ?? ThemeData.light(useMaterial3: true),
         platformGoldensConfig: const PlatformGoldensConfig(enabled: true),
-        ciGoldensConfig: const CiGoldensConfig(enabled: true),
+        ciGoldensConfig: const CiGoldensConfig(enabled: true, obscureText: false),
       ),
       run: () {
         for (final rule in screenRules) {
@@ -133,4 +133,9 @@ Future<void> glintPumpWidget(
   }
   await tester.pumpWidget(widget);
   await effectivePump(tester);
+  if (device != null) {
+    await tester.binding.setSurfaceSize(null);
+    tester.view.resetPhysicalSize();
+    tester.view.resetDevicePixelRatio();
+  }
 }
