@@ -4,14 +4,13 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:glint_capture/glint_capture.dart';
+import 'package:yaml/yaml.dart';
 
 /// CLI for Glint — generates store-ready screenshots.
 ///
 /// Usage:
-///   glint init                    # create glint.yaml + sample screens
-///   glint capture                 # generate screenshots
-///   glint capture --devices pixel7,galaxy_s23
+///   glint init
+///   glint capture
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {
     _printHelp();
@@ -22,7 +21,7 @@ Future<void> main(List<String> args) async {
     case 'init':
       await _init();
     case 'capture':
-      await _capture(_parseArgs(args.sublist(1)));
+      await _capture();
     case '-h':
     case '--help':
     case 'help':
@@ -34,10 +33,11 @@ Future<void> main(List<String> args) async {
   }
 }
 
-/// Initialize a new project with glint.yaml and sample screens file.
+/// Initialize a new project with glint.yaml, screens file, and font config.
 Future<void> _init() async {
   final configPath = 'glint.yaml';
   final screensPath = p.join('test', 'glint_screenshots_test.dart');
+  final fontConfigPath = p.join('test', 'flutter_test_config.dart');
 
   if (File(configPath).existsSync()) {
     print('glint.yaml already exists. Skipping.');
@@ -54,31 +54,53 @@ Future<void> _init() async {
     print('Created $screensPath');
   }
 
+  if (File(fontConfigPath).existsSync()) {
+    print('$fontConfigPath already exists. Skipping.');
+  } else {
+    await Directory(p.dirname(fontConfigPath)).create(recursive: true);
+    await File(fontConfigPath).writeAsString(_defaultFontConfig);
+    print('Created $fontConfigPath');
+  }
+
   print('''
 Done! Next steps:
   1. Edit glint.yaml — set app name, devices
-  2. Edit $screensPath — define your screens
+  2. Edit $screensPath — import your screens and define rules
   3. Run: glint capture
 ''');
 }
 
-/// Generate screenshots from glint.yaml config.
-Future<void> _capture(_Options options) async {
-  final configPath = options.config ?? GLINTConfig.findConfig();
+/// Generate screenshots by running flutter test on the screens file.
+Future<void> _capture() async {
+  final configPath = _findConfig();
   if (configPath == null) {
     print('Error: No glint.yaml found. Run: glint init');
     exit(1);
   }
 
-  final config = GLINTConfig.load(configPath);
+  // Parse config
+  final yaml = loadYaml(File(configPath).readAsStringSync());
+  final appName = yaml['app_name'] as String? ?? 'MyApp';
+  final store = yaml['store'] as String? ?? 'play';
+  final outputDir = yaml['output'] as String? ?? 'glint_screenshots';
+  final devicesRaw = yaml['devices'];
+
+  List<String> deviceNames;
+  if (devicesRaw is String) {
+    deviceNames = [devicesRaw];
+  } else if (devicesRaw is List) {
+    deviceNames = devicesRaw.map((d) => d['name'] as String).toList();
+  } else {
+    deviceNames = ['play_store'];
+  }
 
   print('Glint');
   print('  Config:  $configPath');
-  print('  App:     ${config.appName}');
-  print('  Store:   ${config.store}');
-  print('  Devices: ${config.devices.map((d) => d.name).join(', ')}');
+  print('  App:     $appName');
+  print('  Store:   $store');
+  print('  Devices: ${deviceNames.join(', ')}');
 
-  // Find the screens test file
+  // Find screens file
   final testFile = _findTestFile();
   if (testFile == null) {
     print('\nError: No screens file found. Run: glint init');
@@ -92,6 +114,7 @@ Future<void> _capture(_Options options) async {
   final result = await Process.run('flutter', [
     'test',
     testFile,
+    '--no-pub',
   ], runInShell: true);
 
   stdout.write(result.stdout);
@@ -102,36 +125,25 @@ Future<void> _capture(_Options options) async {
     exit(result.exitCode);
   }
 
-  // Write session.json
-  final outputDir = config.outputDir;
-  final session = GLINTSession.fromDirectory(
-    outputDir: outputDir,
-    appName: config.appName,
-    tagline: config.tagline,
-    store: config.store,
-  );
-  final sessionFile = await session.write(outputDir);
-
   // Count screenshots
   var count = 0;
-  for (final device in config.devices) {
-    final platformDir = switch (device.platform) {
-      GLINTPlatform.android => 'android',
-      GLINTPlatform.ios => 'ios',
-    };
-    final deviceDir = Directory(p.join(outputDir, platformDir, device.name));
-    if (deviceDir.existsSync()) {
-      count += deviceDir
-          .listSync()
-          .whereType<File>()
-          .where((f) => p.extension(f.path) == '.png')
-          .length;
+  final outputDirObj = Directory(outputDir);
+  if (outputDirObj.existsSync()) {
+    for (final entity in outputDirObj.listSync(recursive: true)) {
+      if (entity is File && entity.path.endsWith('.png')) count++;
     }
   }
 
   print('\nDone! Generated $count screenshot(s).');
-  print('Session: ${sessionFile.path}');
-  print('Import $outputDir/ into Glint-Web to apply templates and export.');
+  print('Output: ${p.normalize(outputDir)}/');
+  print('Import into Glint-Web to apply templates and export.');
+}
+
+String? _findConfig() {
+  for (final path in ['glint.yaml', 'glint.yml']) {
+    if (File(path).existsSync()) return path;
+  }
+  return null;
 }
 
 String? _findTestFile() {
@@ -156,67 +168,32 @@ String? _findTestFile() {
   return null;
 }
 
-class _Options {
-  _Options({this.config, this.devices});
-
-  final String? config;
-  final String? devices;
-}
-
-_Options _parseArgs(List<String> args) {
-  String? config;
-  String? devices;
-
-  for (var i = 0; i < args.length; i++) {
-    final arg = args[i];
-    switch (arg) {
-      case '--config':
-        config = _nextArg(args, ++i, '--config');
-      case '--devices':
-      case '-d':
-        devices = _nextArg(args, ++i, arg);
-    }
-  }
-
-  return _Options(config: config, devices: devices);
-}
-
-String _nextArg(List<String> args, int index, String flag) {
-  if (index >= args.length) {
-    print('Error: $flag requires a value');
-    exit(1);
-  }
-  return args[index];
-}
-
 void _printHelp() {
   print('''
 Glint — device-free Flutter screenshot generation
 
 Usage:
-  glint <command> [options]
+  glint <command>
 
 Commands:
-  init                Create glint.yaml + sample screens file
+  init                Create glint.yaml + screens file + font config
   capture             Generate screenshots from config
   help                Show this help
 
-Options:
-  --config <path>     Path to glint.yaml (default: auto-find)
-  -d, --devices <list> Comma-separated device names (overrides config)
-
-Devices:
-  pixel7, galaxy_s23, iphone15, ipad_pro_11
-  play_store (pixel7 + galaxy_s23)
-  app_store (iphone15 + ipad_pro_11)
-  all (all four presets)
+Device Presets (use in glint.yaml):
+  play_store          pixel7 + galaxy_s23 + samsung_m12
+  app_store           iphone14_pro + iphone15 + ipad_10 + ipad_pro_11
+  android             All Android phones
+  ios                 All iOS devices
+  phones              All phones only
+  tablets             All tablets only
+  all                 Everything
 
 Workflow:
   1. glint init
   2. Edit glint.yaml — set app name, devices
-  3. Edit test/glint_screenshots_test.dart — define screens
+  3. Edit test/glint_screenshots_test.dart — import your screens
   4. glint capture
-  5. Import glint_screenshots/ into Glint-Web
 ''');
 }
 
@@ -227,6 +204,13 @@ app_name: MyApp
 tagline: "Your app tagline"
 store: play  # play | ios
 
+# Use a preset:
+# devices: play_store
+# devices: app_store
+# devices: phones
+# devices: all
+
+# Or define custom devices:
 devices:
   - name: pixel7
     width: 412
@@ -238,6 +222,21 @@ devices:
     height: 780
     device_pixel_ratio: 3.0
     platform: android
+  - name: samsung_m12
+    width: 360
+    height: 800
+    device_pixel_ratio: 2.0
+    platform: android
+  - name: iphone14_pro
+    width: 393
+    height: 852
+    device_pixel_ratio: 3.0
+    platform: ios
+  - name: ipad_10
+    width: 820
+    height: 1180
+    device_pixel_ratio: 2.0
+    platform: ios
 ''';
 
 const _defaultScreens = '''import 'package:flutter/material.dart';
@@ -262,5 +261,48 @@ void main() {
       // Add more screens here...
     ],
   );
+}
+''';
+
+const _defaultFontConfig = '''import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+/// Loads real fonts before tests run.
+/// Prevents Ahem font from rendering text as black blocks.
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  // Load Roboto from glint_capture package (not package-prefixed)
+  final robotoLoader = FontLoader('Roboto');
+  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Regular.ttf'));
+  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Medium.ttf'));
+  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Bold.ttf'));
+  await robotoLoader.load();
+
+  // Load all fonts from FontManifest.json (your custom fonts + MaterialIcons)
+  try {
+    final manifestString = await rootBundle.loadString('FontManifest.json');
+    final manifest = json.decode(manifestString) as List<dynamic>;
+
+    for (final entry in manifest) {
+      final family = entry['family'] as String;
+      final fonts = entry['fonts'] as List<dynamic>;
+
+      // Skip Roboto (already loaded above)
+      if (family == 'Roboto' || family == 'packages/glint_capture/Roboto') continue;
+
+      final loader = FontLoader(family);
+      for (final fontAsset in fonts) {
+        final assetPath = fontAsset['asset'] as String;
+        loader.addFont(rootBundle.load(assetPath));
+      }
+      await loader.load();
+    }
+  } catch (_) {}
+
+  await testMain();
 }
 ''';
