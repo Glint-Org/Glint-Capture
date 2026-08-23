@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Captures widgets as PNG screenshots without golden test dependencies.
 class GLINTScreenshot {
   /// Pump [widget] and capture as PNG bytes.
+  /// Waits for all animations and layouts to complete before capturing.
   static Future<Uint8List> capture({
     required WidgetTester tester,
     required Widget widget,
@@ -25,6 +26,7 @@ class GLINTScreenshot {
           devicePixelRatio: devicePixelRatio,
         ),
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           home: Scaffold(
             body: SizedBox(
               width: size.width,
@@ -38,7 +40,9 @@ class GLINTScreenshot {
         ),
       ),
     );
-    await tester.pump();
+
+    // Wait for all animations, layouts, and fonts to settle
+    await tester.pumpAndSettle();
 
     late final Uint8List bytes;
     await tester.runAsync(() async {
