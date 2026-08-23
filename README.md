@@ -8,9 +8,10 @@ Part of the [Glint](https://github.com/darkmintis/Glint-Org) ecosystem.
 
 - Capture screenshots from code — no emulator or physical device
 - Declarative rules API with custom and template-based flows
-- Multi-device presets (Pixel 7, Galaxy S23, iPhone 15, iPad Pro)
+- Multi-device presets (Pixel 7, Galaxy S23, Samsung M12, iPhone 14 Pro, iPad)
 - Outputs PNGs + `session.json` for Glint-Web import
-- Built on [alchemist](https://pub.dev/packages/alchemist) golden testing
+- Real font rendering (Roboto + MaterialIcons) — no Ahem blocks
+- Global CLI: `glint init` → `glint capture`
 
 ## Quick Start
 
