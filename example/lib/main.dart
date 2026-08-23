@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+const _glintAccent = Color(0xFFF5D06F);
+const _glintBg = Color(0xFF0B0D10);
+const _glintSurface = Color(0xFF151A21);
+const _glintText = Color(0xFFE8E6DF);
+
 void main() {
   runApp(const ExampleApp());
 }
@@ -12,7 +17,10 @@ class ExampleApp extends StatelessWidget {
     return MaterialApp(
       title: 'Glint Capture Example',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _glintAccent,
+          brightness: Brightness.light,
+        ),
         useMaterial3: true,
       ),
       home: const HomeScreen(),
@@ -26,12 +34,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(
+        title: const Text('Home'),
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.asset('assets/logo.png', width: 32, height: 32),
+          ),
+        ),
+      ),
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.home, size: 64, color: Colors.deepPurple),
+            Icon(Icons.home, size: 64, color: _glintAccent),
             SizedBox(height: 16),
             Text('Welcome to MyApp', style: TextStyle(fontSize: 24)),
           ],

@@ -8,7 +8,7 @@ void main() {
     appName: 'ExampleApp',
     tagline: 'Screenshot automation made easy',
     devices: GLINTDevices.playStoreDefaults,
-    theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+    theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF5D06F))),
     rules: [
       GLINTRule.screen(
         name: 'home',
