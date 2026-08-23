@@ -5,7 +5,7 @@ import 'package:glint_capture/glint_capture.dart';
 void main() {
   group('GLINTDevice', () {
     test('playStoreDefaults contains android devices', () {
-      expect(GLINTDevices.playStoreDefaults, hasLength(2));
+      expect(GLINTDevices.playStoreDefaults, hasLength(3));
       expect(
         GLINTDevices.playStoreDefaults.every(
           (d) => d.platform == GLINTPlatform.android,
@@ -14,8 +14,8 @@ void main() {
       );
     });
 
-    test('allDefaults includes four presets', () {
-      expect(GLINTDevices.allDefaults, hasLength(4));
+    test('allDefaults includes eight presets', () {
+      expect(GLINTDevices.allDefaults, hasLength(8));
     });
   });
 

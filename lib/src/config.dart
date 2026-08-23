@@ -60,6 +60,10 @@ class GLINTConfig {
         'play_store' => GLINTDevices.playStoreDefaults,
         'app_store' => GLINTDevices.appStoreDefaults,
         'all' => GLINTDevices.allDefaults,
+        'android' => GLINTDevices.resolve('android'),
+        'ios' => GLINTDevices.resolve('ios'),
+        'phones' => GLINTDevices.resolve('phones'),
+        'tablets' => GLINTDevices.resolve('tablets'),
         _ => throw FormatException('Unknown device preset: $raw'),
       };
     }
