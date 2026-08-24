@@ -1,4 +1,4 @@
-# Glint-Capture — Agent Instructions
+# Glint-Capture - Agent Instructions
 
 Capture real Flutter UI into store-sized PNGs and `session.json`.
 
