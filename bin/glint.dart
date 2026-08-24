@@ -3,10 +3,11 @@
 
 import 'dart:io';
 
+import 'package:glint_capture/glint_capture.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
-/// CLI for Glint — generates store-ready screenshots.
+/// CLI for Glint - generates store-ready screenshots.
 ///
 /// Usage:
 ///   glint init
@@ -64,8 +65,8 @@ Future<void> _init() async {
 
   print('''
 Done! Next steps:
-  1. Edit glint.yaml — set app name, devices
-  2. Edit $screensPath — import your screens and define rules
+  1. Edit glint.yaml - set app name, devices
+  2. Edit $screensPath - import your screens and define rules
   3. Run: glint capture
 ''');
 }
@@ -81,6 +82,7 @@ Future<void> _capture() async {
   // Parse config
   final yaml = loadYaml(File(configPath).readAsStringSync());
   final appName = yaml['app_name'] as String? ?? 'MyApp';
+  final tagline = yaml['tagline'] as String?;
   final store = yaml['store'] as String? ?? 'play';
   final outputDir = yaml['output'] as String? ?? 'glint_screenshots';
   final devicesRaw = yaml['devices'];
@@ -134,9 +136,25 @@ Future<void> _capture() async {
     }
   }
 
+  // Write / refresh session.json for Glint-Web import (also emitted by runner tearDownAll).
+  if (count > 0 && outputDirObj.existsSync()) {
+    try {
+      final session = GLINTSession.fromDirectory(
+        outputDir: outputDir,
+        appName: appName,
+        tagline: tagline,
+        store: store,
+      );
+      await session.write(outputDir);
+      print('Wrote session.json (${session.screens.length} screen path(s)).');
+    } catch (e) {
+      print('Warning: could not write session.json: $e');
+    }
+  }
+
   print('\nDone! Generated $count screenshot(s).');
   print('Output: ${p.normalize(outputDir)}/');
-  print('Import into Glint-Web to apply templates and export.');
+  print('Import the folder into Glint-Web to apply templates and export.');
 }
 
 String? _findConfig() {
@@ -170,7 +188,7 @@ String? _findTestFile() {
 
 void _printHelp() {
   print('''
-Glint — device-free Flutter screenshot generation
+Glint - device-free Flutter screenshot generation
 
 Usage:
   glint <command>
@@ -191,8 +209,8 @@ Device Presets (use in glint.yaml):
 
 Workflow:
   1. glint init
-  2. Edit glint.yaml — set app name, devices
-  3. Edit test/glint_screenshots_test.dart — import your screens
+  2. Edit glint.yaml - set app name, devices
+  3. Edit test/glint_screenshots_test.dart - import your screens
   4. glint capture
 ''');
 }
