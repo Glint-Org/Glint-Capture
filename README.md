@@ -2,15 +2,15 @@
 
 Device-free Flutter screenshot capture for Play Store and App Store assets.
 
-Part of the [Glint](https://github.com/darkmintis/Glint-Org) ecosystem.
+Part of the [Glint](https://github.com/Glint-Org) ecosystem.
 
 ## Features
 
-- Capture screenshots from code — no emulator or physical device
+- Capture screenshots from code - no emulator or physical device
 - Declarative rules API with custom and template-based flows
 - Multi-device presets (Pixel 7, Galaxy S23, Samsung M12, iPhone 14 Pro, iPad)
 - Outputs PNGs + `session.json` for Glint-Web import
-- Real font rendering (Roboto + MaterialIcons) — no Ahem blocks
+- Real font rendering (Roboto + MaterialIcons) - no Ahem blocks
 - Global CLI: `glint init` → `glint capture`
 
 ## Quick Start
@@ -51,22 +51,27 @@ void main() {
 ```
 
 ```bash
-dart run glint_capture --app MyApp --output build/glint_screenshots
+# Preferred: project CLI
+glint init
+glint capture
+
+# Or run the test file directly
+flutter test test/glint_screenshots_test.dart
 ```
 
-Import `build/glint_screenshots/` into Glint-Web to apply viral templates and export store-ready assets.
+Both paths write PNGs under the output directory **and** emit `session.json` (schema v1) for Glint-Web.
+
+Import the output folder into Glint-Web to apply templates and export store-ready assets.
 
 ## CLI
 
 ```
-dart run glint_capture [options]
-
-  --test <path>       Test file (default: test/glint_screenshots_test.dart)
-  -o, --output <dir>  Output directory (default: build/glint_screenshots)
-  -a, --app <name>    App name for session.json
-  -t, --tagline       Marketing tagline
-  --store play|ios    Store target
+glint init                 Create glint.yaml + screens test + font config
+glint capture              Run captures from glint.yaml + write session.json
+glint help                 Show help
 ```
+
+Configure devices, app name, tagline, store, and output in `glint.yaml`.
 
 ## Device Presets
 
@@ -97,11 +102,11 @@ Built-in templates: `onboarding_flow`, `feature_highlights`, `settings_profile`.
 
 ```yaml
 # .github/workflows/screenshots.yml
-- run: dart run glint_capture --app ${{ env.APP_NAME }}
+- run: dart run glint_capture capture
 - uses: actions/upload-artifact@v4
   with:
     name: glint-screenshots
-    path: build/glint_screenshots/
+    path: glint_screenshots/
 ```
 
 ## License
