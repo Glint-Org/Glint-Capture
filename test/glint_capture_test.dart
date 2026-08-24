@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:glint_capture/glint_capture.dart';
@@ -35,6 +37,32 @@ void main() {
       expect(json['store'], 'play');
       expect(json['version'], '1.0');
       expect(json['exportedAt'], isNotNull);
+    });
+
+    test('fromDirectory scans nested png paths', () async {
+      final dir = await Directory.systemTemp.createTemp('glint_session_');
+      addTearDown(() => dir.delete(recursive: true));
+
+      final screenDir = Directory('${dir.path}/android/pixel7');
+      await screenDir.create(recursive: true);
+      await File('${screenDir.path}/home.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
+      await File('${screenDir.path}/profile.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
+
+      final session = GLINTSession.fromDirectory(
+        outputDir: dir.path,
+        appName: 'ScanApp',
+        tagline: 'Tag',
+        store: 'play',
+      );
+
+      expect(session.app, 'ScanApp');
+      expect(session.screens, containsAll(['android/pixel7/home.png', 'android/pixel7/profile.png']));
+
+      final written = await session.write(dir.path);
+      expect(await written.exists(), isTrue);
+      final contents = await written.readAsString();
+      expect(contents, contains('"version": "1.0"'));
+      expect(contents, contains('android/pixel7/home.png'));
     });
   });
 
