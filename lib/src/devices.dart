@@ -16,7 +16,7 @@ class GLINTDevice {
   final double textScale;
   final GLINTPlatform platform;
 
-  /// Pixel 7 — Play Store phone default.
+  /// Pixel 7 - Play Store phone default.
   static const pixel7 = GLINTDevice(
     name: 'pixel7',
     size: Size(412, 915),
@@ -32,7 +32,7 @@ class GLINTDevice {
     platform: GLINTPlatform.android,
   );
 
-  /// Samsung Galaxy M12 — budget Android phone.
+  /// Samsung Galaxy M12 - budget Android phone.
   static const samsungM12 = GLINTDevice(
     name: 'samsung_m12',
     size: Size(360, 800),
@@ -40,7 +40,7 @@ class GLINTDevice {
     platform: GLINTPlatform.android,
   );
 
-  /// iPhone 14 Pro — App Store phone.
+  /// iPhone 14 Pro - App Store phone.
   static const iphone14Pro = GLINTDevice(
     name: 'iphone14_pro',
     size: Size(393, 852),
@@ -48,7 +48,7 @@ class GLINTDevice {
     platform: GLINTPlatform.ios,
   );
 
-  /// iPhone 15 — App Store phone.
+  /// iPhone 15 - App Store phone.
   static const iphone15 = GLINTDevice(
     name: 'iphone15',
     size: Size(393, 852),
@@ -56,7 +56,7 @@ class GLINTDevice {
     platform: GLINTPlatform.ios,
   );
 
-  /// iPad (10th gen) — standard iPad.
+  /// iPad (10th gen) - standard iPad.
   static const ipad10 = GLINTDevice(
     name: 'ipad_10',
     size: Size(820, 1180),

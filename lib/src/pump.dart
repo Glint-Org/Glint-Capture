@@ -13,7 +13,7 @@ abstract final class GLINTPump {
   static GLINTPumpFn duration(int milliseconds) =>
       (tester) => tester.pump(Duration(milliseconds: milliseconds));
 
-  /// Single frame pump — no waiting.
+  /// Single frame pump - no waiting.
   static GLINTPumpFn get none =>
       (tester) => tester.pump();
 }
