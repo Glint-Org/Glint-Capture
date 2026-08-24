@@ -7,6 +7,7 @@ import 'devices.dart';
 import 'pump.dart';
 import 'rules.dart';
 import 'screenshot.dart';
+import 'session.dart';
 
 /// Configuration for a glint screenshot test suite.
 class GLINTScreenshotConfig {
@@ -42,7 +43,7 @@ class GLINTScreenshotConfig {
   }
 }
 
-/// Top-level entry point — registers screenshot capture tests.
+/// Top-level entry point - registers screenshot capture tests.
 void glintScreenshots({
   required String appName,
   String? tagline,
@@ -114,6 +115,21 @@ class GLINTRunner {
         );
       }
     }
+
+    // Emit session.json for Glint-Web / Glint-View after all captures.
+    tearDownAll(() async {
+      try {
+        final session = GLINTSession.fromDirectory(
+          outputDir: config.outputDir,
+          appName: config.appName,
+          tagline: config.tagline,
+          store: config.store,
+        );
+        await session.write(config.outputDir);
+      } catch (_) {
+        // Directory may be empty if every capture failed.
+      }
+    });
   }
 }
 
