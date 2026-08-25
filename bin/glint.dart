@@ -199,13 +199,12 @@ Commands:
   help                Show this help
 
 Device Presets (use in glint.yaml):
-  play_store          pixel7 + galaxy_s23 + samsung_m12
-  app_store           iphone14_pro + iphone15 + ipad_10 + ipad_pro_11
-  android             All Android phones
-  ios                 All iOS devices
-  phones              All phones only
-  tablets             All tablets only
-  all                 Everything
+  play_store          pixel9 + galaxy_s24
+  app_store           iphone16_pro_max + iphone16_pro + ipad_pro_129 + ipad_pro_11
+  premium | all       All six curated devices
+  phones              Four phones only
+  tablets             Two iPad Pros
+  android | ios       Same as play_store / app_store
 
 Workflow:
   1. glint init
@@ -216,57 +215,39 @@ Workflow:
 }
 
 const _defaultConfig = '''# Glint configuration
-# Docs: https://github.com/darkmintis/Glint-Capture
+# Docs: https://github.com/Glint-Org/Glint-Capture
+#
+# Soft launch: capture ONE device for clean Glint Web frame mapping.
+# Add more devices later if you need size variants on disk.
 
 app_name: MyApp
 tagline: "Your app tagline"
 store: play  # play | ios
 
-# Use a preset:
+# Presets (multi-device — session.json still picks a primary for Web):
 # devices: play_store
 # devices: app_store
-# devices: phones
-# devices: all
 
-# Or define custom devices:
+# Soft-launch default — Pixel 9 (premium Play phone):
 devices:
-  - name: pixel7
+  - name: pixel9
     width: 412
     height: 915
     device_pixel_ratio: 2.625
     platform: android
-  - name: galaxy_s23
-    width: 360
-    height: 780
-    device_pixel_ratio: 3.0
-    platform: android
-  - name: samsung_m12
-    width: 360
-    height: 800
-    device_pixel_ratio: 2.0
-    platform: android
-  - name: iphone14_pro
-    width: 393
-    height: 852
-    device_pixel_ratio: 3.0
-    platform: ios
-  - name: ipad_10
-    width: 820
-    height: 1180
-    device_pixel_ratio: 2.0
-    platform: ios
 ''';
 
 const _defaultScreens = '''import 'package:flutter/material.dart';
 import 'package:glint_capture/glint_capture.dart';
 
 /// Define your screens here. Each GLINTRule.screen() creates a screenshot.
+/// Soft launch: one device keeps session.json ordered for Glint Web frames.
 ///
 /// Run: glint capture
 void main() {
   glintScreenshots(
     appName: 'MyApp',
-    devices: GLINTDevices.playStoreDefaults,
+    devices: [GLINTDevice.pixel9],
     rules: [
       GLINTRule.screen(
         name: 'home',

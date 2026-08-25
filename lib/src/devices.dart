@@ -1,6 +1,8 @@
 import 'dart:ui';
 
-/// Simulated device configuration for screenshot capture.
+/// Simulated device for screenshot capture.
+///
+/// Curated set only — the devices developers use most for Play / App Store.
 class GLINTDevice {
   const GLINTDevice({
     required this.name,
@@ -16,50 +18,42 @@ class GLINTDevice {
   final double textScale;
   final GLINTPlatform platform;
 
-  /// Pixel 7 - Play Store phone default.
-  static const pixel7 = GLINTDevice(
-    name: 'pixel7',
+  /// Pixel 9 — Play soft-launch default.
+  static const pixel9 = GLINTDevice(
+    name: 'pixel9',
     size: Size(412, 915),
     devicePixelRatio: 2.625,
     platform: GLINTPlatform.android,
   );
 
-  /// Samsung Galaxy S23.
-  static const galaxyS23 = GLINTDevice(
-    name: 'galaxy_s23',
+  /// Galaxy S24 — Play Samsung flagship.
+  static const galaxyS24 = GLINTDevice(
+    name: 'galaxy_s24',
     size: Size(360, 780),
     devicePixelRatio: 3.0,
     platform: GLINTPlatform.android,
   );
 
-  /// Samsung Galaxy M12 - budget Android phone.
-  static const samsungM12 = GLINTDevice(
-    name: 'samsung_m12',
-    size: Size(360, 800),
-    devicePixelRatio: 2.0,
-    platform: GLINTPlatform.android,
+  /// iPhone 16 Pro Max — App Store 6.7" (→ 1290×2796).
+  static const iphone16ProMax = GLINTDevice(
+    name: 'iphone16_pro_max',
+    size: Size(430, 932),
+    devicePixelRatio: 3.0,
+    platform: GLINTPlatform.ios,
   );
 
-  /// iPhone 14 Pro - App Store phone.
-  static const iphone14Pro = GLINTDevice(
-    name: 'iphone14_pro',
+  /// iPhone 16 Pro.
+  static const iphone16Pro = GLINTDevice(
+    name: 'iphone16_pro',
     size: Size(393, 852),
     devicePixelRatio: 3.0,
     platform: GLINTPlatform.ios,
   );
 
-  /// iPhone 15 - App Store phone.
-  static const iphone15 = GLINTDevice(
-    name: 'iphone15',
-    size: Size(393, 852),
-    devicePixelRatio: 3.0,
-    platform: GLINTPlatform.ios,
-  );
-
-  /// iPad (10th gen) - standard iPad.
-  static const ipad10 = GLINTDevice(
-    name: 'ipad_10',
-    size: Size(820, 1180),
+  /// iPad Pro 13" (12.9" logical).
+  static const ipadPro129 = GLINTDevice(
+    name: 'ipad_pro_129',
+    size: Size(1024, 1366),
     devicePixelRatio: 2.0,
     platform: GLINTPlatform.ios,
   );
@@ -68,14 +62,6 @@ class GLINTDevice {
   static const ipadPro11 = GLINTDevice(
     name: 'ipad_pro_11',
     size: Size(834, 1194),
-    devicePixelRatio: 2.0,
-    platform: GLINTPlatform.ios,
-  );
-
-  /// iPad Pro 12.9".
-  static const ipadPro129 = GLINTDevice(
-    name: 'ipad_pro_129',
-    size: Size(1024, 1366),
     devicePixelRatio: 2.0,
     platform: GLINTPlatform.ios,
   );
@@ -96,7 +82,6 @@ class GLINTDevice {
     platform: GLINTPlatform.ios,
   );
 
-  /// Create a custom device with arbitrary dimensions.
   factory GLINTDevice.custom({
     required String name,
     required double width,
@@ -115,42 +100,46 @@ class GLINTDevice {
 
 enum GLINTPlatform { android, ios }
 
-/// Preset device lists for common store targets.
+/// Preset lists — only the curated devices above.
 abstract final class GLINTDevices {
   static const playStoreDefaults = [
-    GLINTDevice.pixel7,
-    GLINTDevice.galaxyS23,
-    GLINTDevice.samsungM12,
+    GLINTDevice.pixel9,
+    GLINTDevice.galaxyS24,
   ];
 
   static const appStoreDefaults = [
-    GLINTDevice.iphone14Pro,
-    GLINTDevice.iphone15,
-    GLINTDevice.ipad10,
-    GLINTDevice.ipadPro11,
-  ];
-
-  static const allDefaults = [
-    GLINTDevice.pixel7,
-    GLINTDevice.galaxyS23,
-    GLINTDevice.samsungM12,
-    GLINTDevice.iphone14Pro,
-    GLINTDevice.iphone15,
-    GLINTDevice.ipad10,
-    GLINTDevice.ipadPro11,
+    GLINTDevice.iphone16ProMax,
+    GLINTDevice.iphone16Pro,
     GLINTDevice.ipadPro129,
+    GLINTDevice.ipadPro11,
   ];
 
-  /// Resolve a preset name to a device list.
+  /// All curated devices (same as [allDefaults]).
+  static const premium = [
+    GLINTDevice.pixel9,
+    GLINTDevice.galaxyS24,
+    GLINTDevice.iphone16ProMax,
+    GLINTDevice.iphone16Pro,
+    GLINTDevice.ipadPro129,
+    GLINTDevice.ipadPro11,
+  ];
+
+  static const allDefaults = premium;
+
   static List<GLINTDevice> resolve(String preset) {
     return switch (preset) {
       'play_store' => playStoreDefaults,
       'app_store' => appStoreDefaults,
-      'all' => allDefaults,
-      'android' => [GLINTDevice.pixel7, GLINTDevice.galaxyS23, GLINTDevice.samsungM12],
-      'ios' => [GLINTDevice.iphone14Pro, GLINTDevice.iphone15, GLINTDevice.ipad10, GLINTDevice.ipadPro11],
-      'phones' => [GLINTDevice.pixel7, GLINTDevice.galaxyS23, GLINTDevice.samsungM12, GLINTDevice.iphone14Pro, GLINTDevice.iphone15],
-      'tablets' => [GLINTDevice.ipad10, GLINTDevice.ipadPro11, GLINTDevice.ipadPro129],
+      'premium' || 'all' => premium,
+      'android' => playStoreDefaults,
+      'ios' => appStoreDefaults,
+      'phones' => [
+        GLINTDevice.pixel9,
+        GLINTDevice.galaxyS24,
+        GLINTDevice.iphone16ProMax,
+        GLINTDevice.iphone16Pro,
+      ],
+      'tablets' => [GLINTDevice.ipadPro129, GLINTDevice.ipadPro11],
       _ => throw ArgumentError('Unknown preset: $preset'),
     };
   }

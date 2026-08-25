@@ -6,18 +6,14 @@ import 'package:glint_capture/glint_capture.dart';
 
 void main() {
   group('GLINTDevice', () {
-    test('playStoreDefaults contains android devices', () {
-      expect(GLINTDevices.playStoreDefaults, hasLength(3));
-      expect(
-        GLINTDevices.playStoreDefaults.every(
-          (d) => d.platform == GLINTPlatform.android,
-        ),
-        isTrue,
-      );
+    test('playStoreDefaults are curated Android phones', () {
+      expect(GLINTDevices.playStoreDefaults, hasLength(2));
+      expect(GLINTDevices.playStoreDefaults.first.name, 'pixel9');
     });
 
-    test('allDefaults includes eight presets', () {
-      expect(GLINTDevices.allDefaults, hasLength(8));
+    test('premium is the full curated set of six', () {
+      expect(GLINTDevices.premium, hasLength(6));
+      expect(GLINTDevices.allDefaults, GLINTDevices.premium);
     });
   });
 
@@ -26,7 +22,7 @@ void main() {
       final session = GLINTSession(
         app: 'TestApp',
         tagline: 'Hello',
-        screens: ['home_pixel7.png', 'profile_pixel7.png'],
+        screens: ['android/pixel9/home.png', 'android/pixel9/profile.png'],
         store: 'play',
       );
 
@@ -39,14 +35,17 @@ void main() {
       expect(json['exportedAt'], isNotNull);
     });
 
-    test('fromDirectory scans nested png paths', () async {
+    test('fromDirectory picks primary device for Web frames', () async {
       final dir = await Directory.systemTemp.createTemp('glint_session_');
       addTearDown(() => dir.delete(recursive: true));
 
-      final screenDir = Directory('${dir.path}/android/pixel7');
-      await screenDir.create(recursive: true);
-      await File('${screenDir.path}/home.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
-      await File('${screenDir.path}/profile.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
+      final pixel = Directory('${dir.path}/android/pixel9');
+      final galaxy = Directory('${dir.path}/android/galaxy_s24');
+      await pixel.create(recursive: true);
+      await galaxy.create(recursive: true);
+      await File('${pixel.path}/home.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
+      await File('${pixel.path}/profile.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
+      await File('${galaxy.path}/home.png').writeAsBytes([0x89, 0x50, 0x4E, 0x47]);
 
       final session = GLINTSession.fromDirectory(
         outputDir: dir.path,
@@ -56,13 +55,17 @@ void main() {
       );
 
       expect(session.app, 'ScanApp');
-      expect(session.screens, containsAll(['android/pixel7/home.png', 'android/pixel7/profile.png']));
+      expect(session.screens, [
+        'android/pixel9/home.png',
+        'android/pixel9/profile.png',
+      ]);
 
       final written = await session.write(dir.path);
       expect(await written.exists(), isTrue);
       final contents = await written.readAsString();
       expect(contents, contains('"version": "1.0"'));
-      expect(contents, contains('android/pixel7/home.png'));
+      expect(contents, contains('android/pixel9/home.png'));
+      expect(contents, isNot(contains('galaxy_s24')));
     });
   });
 

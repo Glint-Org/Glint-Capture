@@ -7,7 +7,7 @@ void main() {
   glintScreenshots(
     appName: 'ExampleApp',
     tagline: 'Screenshot automation made easy',
-    devices: GLINTDevices.playStoreDefaults,
+    devices: [GLINTDevice.pixel9],
     theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFF5D06F))),
     rules: [
       GLINTRule.screen(
