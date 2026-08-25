@@ -1,0 +1,13 @@
+{
+  "app": "ExampleApp",
+  "tagline": "Screenshot automation made easy",
+  "screens": [
+    "android/pixel9/confirm_dialog.png",
+    "android/pixel9/home.png",
+    "android/pixel9/profile.png",
+    "android/pixel9/settings.png"
+  ],
+  "store": "play",
+  "version": "1.0",
+  "exportedAt": "2026-08-25T05:29:09.490364Z"
+}
