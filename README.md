@@ -38,10 +38,52 @@ glint capture
 ## Features
 
 - Screenshots from Flutter widget tests - no emulator required
+- Any widget tree you build: pages, dialogs, bottom sheets, drawers, custom painters
+- Full device pixel size (logical × DPR) with Roboto + MaterialIcons
 - Declarative `GLINTRule` API + template flows
-- Device presets for Play and App Store
-- PNGs + `session.json` (schema v1) for Glint Web
-- Real fonts (Roboto + MaterialIcons) via `flutter_test_config.dart`
+- Six curated store devices + `session.json` for Glint Web
+
+## What you can capture
+
+| UI | How |
+|----|-----|
+| Pages / `Scaffold` | `builder: (_) => const HomeScreen()` |
+| Dialog / bottom sheet | Compose in the tree, **or** open with `pump:` (tap then settle) |
+| Drawer / snackbar / overlay | Same — build it or trigger it in `pump` |
+| Custom fonts | Declare in host `pubspec` → loaded via `flutter_test_config.dart` |
+| Asset images | Yes if listed in `pubspec` |
+
+**Not** a live-device recorder: it captures the Flutter widget tree in tests (same pixels as your UI), not Android/iOS system chrome, platform views, or unreproducible network images without mocks.
+
+```dart
+// Dialog composed in the tree
+GLINTRule.screen(
+  name: 'confirm',
+  builder: (context) => Stack(
+    fit: StackFit.expand,
+    children: [
+      const HomeScreen(),
+      ModalBarrier(color: Colors.black54, dismissible: false),
+      Center(child: AlertDialog(
+        title: Text('Delete?'),
+        actions: [TextButton(onPressed: () {}, child: Text('Cancel'))],
+      )),
+    ],
+  ),
+),
+
+// Or open a real sheet after pump
+GLINTRule.screen(
+  name: 'filters',
+  builder: (context) => const HomeScreen(),
+  pump: (tester) async {
+    await tester.tap(find.byIcon(Icons.tune));
+    await tester.pumpAndSettle();
+  },
+),
+```
+
+Require `test/flutter_test_config.dart` (`glint init` creates it) so text is Roboto, not Ahem.
 
 ## Quick example
 

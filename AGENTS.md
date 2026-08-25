@@ -18,3 +18,5 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 2. Keep rules deterministic and CI-friendly
 3. Soft launch: prefer **one device** so `session.json` maps cleanly onto Web frames
 4. Preserve screen order within that device
+5. Always ship `test/flutter_test_config.dart` (Roboto + MaterialIcons) — never Ahem
+6. Capture any Flutter widget tree (pages, dialogs, sheets); use `pump:` to open modals
