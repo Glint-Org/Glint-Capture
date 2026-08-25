@@ -2,18 +2,35 @@ import 'package:flutter/widgets.dart';
 
 import 'pump.dart';
 
+/// Wraps the screen under test (e.g. add a [Navigator], [Scaffold], provider).
+typedef GLINTWrapper = Widget Function(Widget child);
+
 /// A declarative screenshot capture rule.
 sealed class GLINTRule {
   const GLINTRule({required this.name});
 
   final String name;
 
-  /// Capture a single screen widget.
+  /// Capture a single screen or overlay widget tree.
+  ///
+  /// Return any design you built: pages, dialogs, sheets, drawers, custom
+  /// painters. For modal UI, either compose it in the tree or open it in [pump]:
+  ///
+  /// ```dart
+  /// GLINTRule.screen(
+  ///   name: 'confirm',
+  ///   builder: (context) => const HomeScreen(),
+  ///   pump: (tester) async {
+  ///     await tester.tap(find.text('Delete'));
+  ///     await tester.pumpAndSettle();
+  ///   },
+  /// )
+  /// ```
   factory GLINTRule.screen({
     required String name,
     required WidgetBuilder builder,
     GLINTPumpFn? pump,
-    Widget? wrapper,
+    GLINTWrapper? wrapper,
   }) = GLINTScreenRule;
 
   /// Expand a built-in template into multiple screen rules.
@@ -34,7 +51,7 @@ class GLINTScreenRule extends GLINTRule {
 
   final WidgetBuilder builder;
   final GLINTPumpFn pump;
-  final Widget? wrapper;
+  final GLINTWrapper? wrapper;
 }
 
 class GLINTTemplateRule extends GLINTRule {

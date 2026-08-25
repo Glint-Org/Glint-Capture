@@ -240,8 +240,10 @@ devices:
 const _defaultScreens = '''import 'package:flutter/material.dart';
 import 'package:glint_capture/glint_capture.dart';
 
-/// Define your screens here. Each GLINTRule.screen() creates a screenshot.
+/// Return real app screens (Scaffold / page widgets), not a nested MaterialApp.
 /// Soft launch: one device keeps session.json ordered for Glint Web frames.
+///
+/// Dialogs / bottom sheets: compose them in the tree, or open them in [pump].
 ///
 /// Run: glint capture
 void main() {
@@ -251,13 +253,11 @@ void main() {
     rules: [
       GLINTRule.screen(
         name: 'home',
-        builder: (context) => const MaterialApp(
-          home: Scaffold(
-            body: Center(child: Text('Home Screen')),
-          ),
+        builder: (context) => const Scaffold(
+          body: Center(child: Text('Home Screen')),
         ),
       ),
-      // Add more screens here...
+      // Add more screens, dialogs, or sheets here...
     ],
   );
 }
@@ -269,19 +269,29 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Loads real fonts before tests run.
-/// Prevents Ahem font from rendering text as black blocks.
+/// Loads real fonts before tests so captures are not Ahem blocks.
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Load Roboto from glint_capture package (not package-prefixed)
   final robotoLoader = FontLoader('Roboto');
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Regular.ttf'));
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Medium.ttf'));
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Bold.ttf'));
+  for (final asset in [
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Thin.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Light.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Regular.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Medium.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Bold.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Black.ttf',
+  ]) {
+    robotoLoader.addFont(rootBundle.load(asset));
+  }
   await robotoLoader.load();
 
-  // Load all fonts from FontManifest.json (your custom fonts + MaterialIcons)
+  try {
+    final iconsLoader = FontLoader('MaterialIcons');
+    iconsLoader.addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+    await iconsLoader.load();
+  } catch (_) {}
+
   try {
     final manifestString = await rootBundle.loadString('FontManifest.json');
     final manifest = json.decode(manifestString) as List<dynamic>;
@@ -289,14 +299,14 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     for (final entry in manifest) {
       final family = entry['family'] as String;
       final fonts = entry['fonts'] as List<dynamic>;
-
-      // Skip Roboto (already loaded above)
-      if (family == 'Roboto' || family == 'packages/glint_capture/Roboto') continue;
-
+      if (family == 'Roboto' ||
+          family == 'packages/glint_capture/Roboto' ||
+          family == 'MaterialIcons') {
+        continue;
+      }
       final loader = FontLoader(family);
       for (final fontAsset in fonts) {
-        final assetPath = fontAsset['asset'] as String;
-        loader.addFont(rootBundle.load(assetPath));
+        loader.addFont(rootBundle.load(fontAsset['asset'] as String));
       }
       await loader.load();
     }

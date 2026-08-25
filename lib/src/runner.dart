@@ -85,16 +85,19 @@ class GLINTRunner {
         testWidgets(
           '${rule.name} on ${device.name}',
           (tester) async {
+            Widget content = Builder(builder: rule.builder);
+            if (rule.wrapper != null) {
+              content = rule.wrapper!(content);
+            }
+
             final bytes = await GLINTScreenshot.capture(
               tester: tester,
-              widget: config.theme != null
-                  ? MaterialApp(
-                      theme: config.theme,
-                      home: Builder(builder: rule.builder),
-                    )
-                  : Builder(builder: rule.builder),
+              widget: content,
               size: device.size,
               devicePixelRatio: device.devicePixelRatio,
+              textScale: device.textScale,
+              theme: config.theme,
+              pump: rule.pump,
             );
 
             final platformDir = switch (device.platform) {
@@ -143,6 +146,10 @@ Future<void> glintPumpWidget(
   final effectivePump = pump ?? GLINTPump.settle;
   if (device != null) {
     await tester.binding.setSurfaceSize(device.size);
+    tester.view.physicalSize = Size(
+      device.size.width * device.devicePixelRatio,
+      device.size.height * device.devicePixelRatio,
+    );
     tester.view.devicePixelRatio = device.devicePixelRatio;
   }
   await tester.pumpWidget(widget);

@@ -4,22 +4,34 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Loads real fonts before tests run.
-/// Prevents Ahem font from rendering text as black blocks.
+/// Loads real fonts before tests run so captures are not Ahem blocks.
 ///
-/// 1. Loads Roboto from glint_capture package assets (guaranteed available)
-/// 2. Loads all fonts from FontManifest.json (developer's custom fonts)
+/// Loads Roboto (all common weights) + MaterialIcons, then every family in
+/// FontManifest.json (host app custom fonts).
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  // Load Roboto from package assets (not package-prefixed)
   final robotoLoader = FontLoader('Roboto');
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Regular.ttf'));
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Medium.ttf'));
-  robotoLoader.addFont(rootBundle.load('packages/glint_capture/assets/fonts/Roboto/Roboto-Bold.ttf'));
+  for (final asset in [
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Thin.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Light.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Regular.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Medium.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Bold.ttf',
+    'packages/glint_capture/assets/fonts/Roboto/Roboto-Black.ttf',
+  ]) {
+    robotoLoader.addFont(rootBundle.load(asset));
+  }
   await robotoLoader.load();
 
-  // Load all fonts from FontManifest.json (developer's custom fonts + MaterialIcons)
+  try {
+    final iconsLoader = FontLoader('MaterialIcons');
+    iconsLoader.addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+    await iconsLoader.load();
+  } catch (_) {
+    // Host apps usually get MaterialIcons via FontManifest below.
+  }
+
   try {
     final manifestString = await rootBundle.loadString('FontManifest.json');
     final manifest = json.decode(manifestString) as List<dynamic>;
@@ -28,8 +40,11 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
       final family = entry['family'] as String;
       final fonts = entry['fonts'] as List<dynamic>;
 
-      // Skip Roboto (already loaded above with correct family name)
-      if (family == 'Roboto' || family == 'packages/glint_capture/Roboto') continue;
+      if (family == 'Roboto' ||
+          family == 'packages/glint_capture/Roboto' ||
+          family == 'MaterialIcons') {
+        continue;
+      }
 
       final loader = FontLoader(family);
       for (final fontAsset in fonts) {
@@ -38,9 +53,7 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
       }
       await loader.load();
     }
-  } catch (_) {
-    // FontManifest.json may not exist in all environments
-  }
+  } catch (_) {}
 
   await testMain();
 }
