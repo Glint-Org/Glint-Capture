@@ -16,4 +16,5 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 
 1. Use real app widgets/screens only
 2. Keep rules deterministic and CI-friendly
-3. Preserve `session.json` order so Web exports in the same sequence
+3. Soft launch: prefer **one device** so `session.json` maps cleanly onto Web frames
+4. Preserve screen order within that device

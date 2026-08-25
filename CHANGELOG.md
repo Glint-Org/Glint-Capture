@@ -2,12 +2,10 @@
 
 ## 0.1.0
 
-- Initial release
-- `GLINTDevice` presets for Pixel 7, Galaxy S23, iPhone 15, iPad Pro
-- `GLINTRule.screen()` and `GLINTRule.template()` declarative API
-- Alchemist-based golden screenshot runner
-- CLI: `dart run glint_capture`
-- Session JSON output compatible with Glint-Web and Glint-View
-- Built-in templates: onboarding_flow, feature_highlights, settings_profile
-- Example app with sample screenshot rules
-- GitHub Actions CI workflow
+- Initial soft-launch release
+- `glintScreenshots` / `GLINTRule` capture API
+- Device presets for Play Store and App Store
+- CLI: `glint init`, `glint capture`
+- `session.json` schema v1 for Glint Web
+- Font loading for golden-quality captures (Roboto; MaterialIcons via host FontManifest when present)
+- Curated device presets only: Pixel 9, Galaxy S24, iPhone 16 Pro / Pro Max, iPad Pro 11"/13"
