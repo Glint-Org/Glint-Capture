@@ -6,7 +6,17 @@ Part of the [Glint](https://github.com/Glint-Org) ecosystem. Soft-launch path: *
 
 ## Install
 
-**Preferred (path / git until pub.dev):**
+**Git tag (soft launch — until pub.dev):**
+
+```yaml
+dev_dependencies:
+  glint_capture:
+    git:
+      url: https://github.com/Glint-Org/Glint-Capture.git
+      ref: v0.1.0
+```
+
+**Monorepo path:**
 
 ```yaml
 dev_dependencies:
@@ -14,25 +24,27 @@ dev_dependencies:
     path: ../Glint-Capture
 ```
 
-Or:
-
-```yaml
-dev_dependencies:
-  glint_capture:
-    git:
-      url: https://github.com/Glint-Org/Glint-Capture.git
-```
-
-Then activate the CLI from this package:
+Then activate the CLI:
 
 ```bash
-dart pub global activate --source path .
-# or: dart pub global activate --source git https://github.com/Glint-Org/Glint-Capture.git
+dart pub global activate --source git https://github.com/Glint-Org/Glint-Capture.git
+# or from a checkout: dart pub global activate --source path .
 ```
 
 ```bash
 glint init
 glint capture
+```
+
+**pub.dev:** package name `glint_capture`. After first publish:
+
+```yaml
+dev_dependencies:
+  glint_capture: ^0.1.0
+```
+
+```bash
+dart pub global activate glint_capture
 ```
 
 ## Features
