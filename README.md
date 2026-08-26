@@ -33,7 +33,9 @@ dart pub global activate --source git https://github.com/Glint-Org/Glint-Capture
 
 ```bash
 glint init
-glint capture
+glint capture              # manual rules
+glint capture --auto       # scan lib/ for screens, write rules, capture
+# Or ask Cursor / Copilot: "capture store screenshots for this app"
 ```
 
 **pub.dev:** package name `glint_capture`. After first publish:
@@ -50,6 +52,8 @@ dart pub global activate glint_capture
 ## Features
 
 - Screenshots from Flutter widget tests - no emulator required
+- **Manual rules** or **auto discover** (`glint discover` / `glint capture --auto`) — finds real `*Screen`/`*Page` widgets and writes builders
+- Works with **agentic IDEs** (Cursor / Copilot / Claude) — the agent crawls code and captures; no Glint API keys
 - Any widget tree you build: pages, dialogs, bottom sheets, drawers, custom painters
 - Full device pixel size (logical × DPR) with Roboto + MaterialIcons
 - Declarative `GLINTRule` API + template flows

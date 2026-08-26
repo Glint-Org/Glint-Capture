@@ -19,8 +19,10 @@ library;
 
 export 'src/config.dart';
 export 'src/devices.dart';
+export 'src/discover/models.dart';
 export 'src/pump.dart';
 export 'src/rules.dart';
 export 'src/runner.dart';
 export 'src/screenshot.dart';
 export 'src/session.dart';
+

@@ -2,10 +2,13 @@
 
 Capture real Flutter UI into store-sized PNGs and `session.json`.
 
+**You (the agent) are the intelligence.** Developers should not configure Capture API keys.
+
 ## Primary commands
 
 - `glint init`
-- `glint capture`
+- `glint discover [--write]` — scan `lib/` for `*Screen` / `*Page` (no device)
+- `glint capture [--auto]` — widget-test screenshots (`--auto` = discover + write + capture)
 
 ## Outputs
 
@@ -20,3 +23,4 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 4. Preserve screen order within that device
 5. Always ship `test/flutter_test_config.dart` (Roboto + MaterialIcons) — never Ahem
 6. Capture any Flutter widget tree (pages, dialogs, sheets); use `pump:` to open modals
+7. Never invent UI pixels; never ask the user for LLM API keys for Capture

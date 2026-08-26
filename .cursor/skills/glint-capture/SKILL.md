@@ -5,6 +5,8 @@ description: Set up Glint Capture and produce real Flutter store screenshots (se
 
 # Glint Capture (agent)
 
+You are the AI. Developers do **not** paste API keys into Glint. You discover screens, write real rules, and run capture.
+
 ## Install
 
 ```yaml
@@ -21,19 +23,24 @@ dart pub global activate --source git https://github.com/Glint-Org/Glint-Capture
 glint init
 ```
 
-## Capture
+## How you capture (agent)
 
-1. Edit generated test / rules — each screen must build **real** app widgets.
-2. Soft launch: configure **pixel9** only.
-3. Run `glint capture`.
-4. Confirm `glint_screenshots/session.json` + PNGs.
+1. Scan the app `lib/` for real screens (`*Screen` / `*Page`) — or run `glint discover --write` / `glint capture --auto`.
+2. Ensure `test/glint_screenshots_test.dart` uses **real** app widgets (fix generated builders if needed).
+3. Soft launch: **pixel9** only.
+4. Run `glint capture` (or `glint capture --auto`).
+5. Confirm `glint_screenshots/session.json` + PNGs.
+
+## Manual (developer)
+
+They edit `test/glint_screenshots_test.dart` themselves → `glint capture`.
 
 ## Do not
 
+- Ask the developer for OpenAI/Anthropic API keys for Capture
 - Fabricate UI bitmaps
-- Skip widget builders for “placeholder” marketing art
-- Mix Play and App Store sizes in one Capture run without separate sessions
+- Leave placeholder `Text('Home Screen')` scaffolds when real screens exist
 
 ## Next
 
-Import into Glint Web or call MCP `glint_export` / headless script. Docs: `Glint-Docs/guides/golden-path.md`.
+Import into Glint Web or MCP `glint_export`. Docs: `Glint-Docs/guides/golden-path.md`.

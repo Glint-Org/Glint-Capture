@@ -3,7 +3,8 @@
 
 import 'dart:io';
 
-import 'package:glint_capture/glint_capture.dart';
+import 'package:glint_capture/src/discover/discover.dart';
+import 'package:glint_capture/src/session.dart';
 import 'package:path/path.dart' as p;
 import 'package:yaml/yaml.dart';
 
@@ -11,30 +12,46 @@ import 'package:yaml/yaml.dart';
 ///
 /// Usage:
 ///   glint init
-///   glint capture
+///   glint discover [--write] [--max N]
+///   glint capture [--auto]
+///
+/// Agents (Cursor / Copilot / Claude): discover screens, write real rules,
+/// run capture — no developer API keys required.
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {
     _printHelp();
     return;
   }
 
-  switch (args.first) {
+  final command = args.first;
+  final rest = args.skip(1).toList();
+
+  switch (command) {
     case 'init':
       await _init();
+    case 'discover':
+      await _discover(rest);
     case 'capture':
+      // --auto / --ai / --discover: scan lib/ and write rules, then capture
+      final auto = rest.any((a) => a == '--auto' || a == '--ai' || a == '--discover');
+      if (auto) {
+        await _discover([
+          '--write',
+          ...rest.where((a) => a != '--auto' && a != '--ai' && a != '--discover'),
+        ]);
+      }
       await _capture();
     case '-h':
     case '--help':
     case 'help':
       _printHelp();
     default:
-      print('Unknown command: ${args.first}');
+      print('Unknown command: $command');
       print('Run: glint help');
       exit(1);
   }
 }
 
-/// Initialize a new project with glint.yaml, screens file, and font config.
 Future<void> _init() async {
   final configPath = 'glint.yaml';
   final screensPath = p.join('test', 'glint_screenshots_test.dart');
@@ -64,14 +81,79 @@ Future<void> _init() async {
   }
 
   print('''
-Done! Next steps:
-  1. Edit glint.yaml - set app name, devices
-  2. Edit $screensPath - import your screens and define rules
-  3. Run: glint capture
+Done! Next steps (pick one):
+  Manual:  edit $screensPath with your real screens → glint capture
+  Auto:    glint capture --auto   (scans lib/ for *Screen/*Page, writes rules, captures)
+  Agent:   ask Cursor / Copilot to capture store screenshots for this app
 ''');
 }
 
-/// Generate screenshots by running flutter test on the screens file.
+Future<void> _discover(List<String> args) async {
+  final write = args.contains('--write') || args.contains('-w');
+  var maxKeep = 8;
+  for (var i = 0; i < args.length; i++) {
+    if ((args[i] == '--max' || args[i] == '--max-screens') && i + 1 < args.length) {
+      maxKeep = int.tryParse(args[i + 1]) ?? maxKeep;
+    }
+  }
+
+  final root = Directory.current.path;
+  final configPath = _findConfig();
+  var appName = 'MyApp';
+  String? tagline;
+  if (configPath != null) {
+    final yaml = loadYaml(File(configPath).readAsStringSync());
+    if (yaml is YamlMap) {
+      appName = yaml['app_name'] as String? ?? appName;
+      tagline = yaml['tagline'] as String?;
+    }
+  }
+
+  print('Glint discover');
+  print('  Root: $root');
+  print('  Mode: scan lib/ for *Screen / *Page widgets');
+
+  final scanner = ScreenScanner(projectRoot: root);
+  List<DiscoveredScreen> found;
+  try {
+    found = await scanner.scan();
+  } catch (e) {
+    print('Error: $e');
+    exit(1);
+  }
+
+  if (found.isEmpty) {
+    print('No *Screen / *Page widgets found under lib/.');
+    print('Name screens like HomeScreen, write rules manually, or ask your agent.');
+    exit(1);
+  }
+
+  print('  Found: ${found.length} candidate(s)');
+  final picks = found.take(maxKeep).toList();
+
+  for (final s in picks) {
+    print(
+      '  • ${s.name.padRight(16)} ${s.className}  '
+      'score=${s.score.toStringAsFixed(2)}  (${s.reason})',
+    );
+  }
+
+  if (!write) {
+    print('\nDry run. Re-run with --write to update test/glint_screenshots_test.dart');
+    print('Or: glint capture --auto');
+    return;
+  }
+
+  final codegen = ScreensTestCodegen(
+    projectRoot: root,
+    appName: appName,
+    tagline: tagline,
+  );
+  final file = await codegen.mergeOrWrite(picks);
+  print('\nWrote ${p.relative(file.path)}');
+  print('Next: glint capture  (or ask your agent to polish rules + capture)');
+}
+
 Future<void> _capture() async {
   final configPath = _findConfig();
   if (configPath == null) {
@@ -79,7 +161,6 @@ Future<void> _capture() async {
     exit(1);
   }
 
-  // Parse config
   final yaml = loadYaml(File(configPath).readAsStringSync());
   final appName = yaml['app_name'] as String? ?? 'MyApp';
   final tagline = yaml['tagline'] as String?;
@@ -102,17 +183,15 @@ Future<void> _capture() async {
   print('  Store:   $store');
   print('  Devices: ${deviceNames.join(', ')}');
 
-  // Find screens file
   final testFile = _findTestFile();
   if (testFile == null) {
-    print('\nError: No screens file found. Run: glint init');
+    print('\nError: No screens file found. Run: glint init  or  glint discover --write');
     exit(1);
   }
 
   print('  Screens: ${p.relative(testFile)}');
   print('\nCapturing...');
 
-  // Run flutter test
   final result = await Process.run('flutter', [
     'test',
     testFile,
@@ -127,7 +206,6 @@ Future<void> _capture() async {
     exit(result.exitCode);
   }
 
-  // Count screenshots
   var count = 0;
   final outputDirObj = Directory(outputDir);
   if (outputDirObj.existsSync()) {
@@ -136,7 +214,6 @@ Future<void> _capture() async {
     }
   }
 
-  // Write / refresh session.json for Glint-Web import (also emitted by runner tearDownAll).
   if (count > 0 && outputDirObj.existsSync()) {
     try {
       final session = GLINTSession.fromDirectory(
@@ -154,7 +231,7 @@ Future<void> _capture() async {
 
   print('\nDone! Generated $count screenshot(s).');
   print('Output: ${p.normalize(outputDir)}/');
-  print('Import the folder into Glint-Web to apply templates and export.');
+  print('Next: import into Glint Web → template → polish → export ZIP.');
 }
 
 String? _findConfig() {
@@ -188,29 +265,28 @@ String? _findTestFile() {
 
 void _printHelp() {
   print('''
-Glint - device-free Flutter screenshot generation
+Glint Capture - device-free Flutter store screenshots
 
 Usage:
   glint <command>
 
 Commands:
-  init                Create glint.yaml + screens file + font config
-  capture             Generate screenshots from config
-  help                Show this help
+  init                      Create glint.yaml + screens file + font config
+  discover [--write] [--max N]
+                            Scan lib/ for *Screen/*Page and optionally write rules
+  capture [--auto]          Run flutter test screenshots
+                            --auto = discover + write rules, then capture
+  help                      Show this help
 
-Device Presets (use in glint.yaml):
-  play_store          pixel9 + galaxy_s24
-  app_store           iphone16_pro_max + iphone16_pro + ipad_pro_129 + ipad_pro_11
-  premium | all       All six curated devices
-  phones              Four phones only
-  tablets             Two iPad Pros
-  android | ios       Same as play_store / app_store
+Two ways for developers:
+  Manual   Edit test/glint_screenshots_test.dart → glint capture
+  Auto     glint capture --auto
 
-Workflow:
-  1. glint init
-  2. Edit glint.yaml - set app name, devices
-  3. Edit test/glint_screenshots_test.dart - import your screens
-  4. glint capture
+Agentic IDEs (Cursor / Copilot / Claude Code):
+  Ask the agent to capture store screenshots — it uses discover/rules + capture.
+  No API keys to configure in Glint.
+
+Then: import glint_screenshots/ into Glint Web → templates → polish → ZIP.
 ''');
 }
 
@@ -245,7 +321,9 @@ import 'package:glint_capture/glint_capture.dart';
 ///
 /// Dialogs / bottom sheets: compose them in the tree, or open them in [pump].
 ///
-/// Run: glint capture
+/// Manual: edit rules below → glint capture
+/// Auto:   glint capture --auto   (discovers *Screen/*Page in lib/)
+/// Agent:  ask Cursor / Copilot to set up and capture screenshots
 void main() {
   glintScreenshots(
     appName: 'MyApp',
