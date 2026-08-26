@@ -115,9 +115,10 @@ class GLINTSession {
     if (byDevice.isEmpty) return [];
 
     String? platformHint;
-    if (store == 'ios' || store == 'ios-tablet') {
+    final normalized = store.contains('/') ? store.split('/').first : store;
+    if (normalized == 'ios' || store == 'ios-tablet' || store == 'ios/iphone' || store == 'ios/ipad') {
       platformHint = 'ios';
-    } else if (store == 'play') {
+    } else if (normalized == 'play' || store == 'android') {
       platformHint = 'android';
     }
 
@@ -130,13 +131,21 @@ class GLINTSession {
     }
 
     // Curated devices only — prefer store-appropriate primary.
-    final preferredDevices = store == 'ios' || store == 'ios-tablet'
-        ? [
-            'iphone16_pro_max',
-            'iphone16_pro',
-            'ipad_pro_129',
-            'ipad_pro_11',
-          ]
+    final isIpad = store == 'ios-tablet' || store == 'ios/ipad';
+    final preferredDevices = (platformHint == 'ios')
+        ? (isIpad
+            ? [
+                'ipad_pro_129',
+                'ipad_pro_11',
+                'iphone16_pro_max',
+                'iphone16_pro',
+              ]
+            : [
+                'iphone16_pro_max',
+                'iphone16_pro',
+                'ipad_pro_129',
+                'ipad_pro_11',
+              ])
         : [
             'pixel9',
             'galaxy_s24',
