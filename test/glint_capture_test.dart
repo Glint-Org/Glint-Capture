@@ -97,5 +97,23 @@ void main() {
       expect(GLINTTemplates.resolve('onboarding_flow'), hasLength(5));
       expect(GLINTTemplates.resolve('feature_highlights'), hasLength(5));
     });
+
+    test('unknown template throws', () {
+      expect(
+        () => GLINTTemplates.resolve('not_a_real_template'),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+  });
+
+  group('GLINTSession store keys', () {
+    test('preserves canonical store ids in JSON', () {
+      final session = GLINTSession(
+        app: 'Canonical',
+        screens: ['android/pixel9/home.png'],
+        store: 'play/phone',
+      );
+      expect(session.toJson()['store'], 'play/phone');
+    });
   });
 }

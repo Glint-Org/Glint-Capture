@@ -57,6 +57,16 @@ class ProfileScreen extends StatelessWidget {
     expect(src, contains("import 'package:demo_app/screens/home_screen.dart';"));
     expect(src, contains('const HomeScreen()'));
     expect(src, contains("name: 'home'"));
-    expect(src, isNot(contains('Text(\'Home Screen\')')));
+    expect(src, isNot(contains("Text('Home Screen')")));
+  });
+
+  test('scanner returns empty when lib has no screens', () async {
+    await File(p.join(tmp.path, 'pubspec.yaml')).writeAsString('name: empty_app\n');
+    await Directory(p.join(tmp.path, 'lib')).create(recursive: true);
+    await File(p.join(tmp.path, 'lib', 'main.dart')).writeAsString('''
+void main() {}
+''');
+    final screens = await ScreenScanner(projectRoot: tmp.path).scan();
+    expect(screens, isEmpty);
   });
 }
