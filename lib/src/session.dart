@@ -6,24 +6,18 @@ import 'package:path/path.dart' as p;
 /// Writes a Glint session JSON file compatible with Glint-Web and Glint-View.
 class GLINTSession {
   GLINTSession({
-    required this.app,
     required this.screens,
-    this.tagline,
     this.store = 'play',
     this.version = '1.0',
     DateTime? exportedAt,
   }) : exportedAt = exportedAt ?? DateTime.now().toUtc();
 
-  final String app;
-  final String? tagline;
   final List<String> screens;
   final String store;
   final String version;
   final DateTime exportedAt;
 
   Map<String, dynamic> toJson() => {
-    'app': app,
-    if (tagline != null) 'tagline': tagline,
     'screens': screens,
     'store': store,
     'version': version,
@@ -63,8 +57,6 @@ class GLINTSession {
   /// disk for optional use. Prefer soft-launch captures with a single device.
   static GLINTSession fromDirectory({
     required String outputDir,
-    required String appName,
-    String? tagline,
     String store = 'play',
     String? primaryDevice,
   }) {
@@ -99,8 +91,6 @@ class GLINTSession {
     final screens = _pickPrimaryScreens(byDevice, store, primaryDevice);
 
     return GLINTSession(
-      app: appName,
-      tagline: tagline,
       screens: screens,
       store: store,
     );

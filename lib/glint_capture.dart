@@ -5,7 +5,6 @@
 ///
 /// void main() {
 ///   glintScreenshots(
-///     appName: 'MyApp',
 ///     rules: [
 ///       GLINTRule.screen(
 ///         name: 'home',

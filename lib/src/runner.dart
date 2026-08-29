@@ -12,8 +12,6 @@ import 'session.dart';
 /// Configuration for a glint screenshot test suite.
 class GLINTScreenshotConfig {
   const GLINTScreenshotConfig({
-    required this.appName,
-    this.tagline,
     this.outputDir = 'glint_screenshots',
     this.devices = GLINTDevices.playStoreDefaults,
     required this.rules,
@@ -21,8 +19,6 @@ class GLINTScreenshotConfig {
     this.store = 'play',
   });
 
-  final String appName;
-  final String? tagline;
   final String outputDir;
   final List<GLINTDevice> devices;
   final List<GLINTRule> rules;
@@ -33,8 +29,6 @@ class GLINTScreenshotConfig {
   factory GLINTScreenshotConfig.fromYaml(String path) {
     final yaml = GLINTConfig.load(path);
     return GLINTScreenshotConfig(
-      appName: yaml.appName,
-      tagline: yaml.tagline,
       outputDir: yaml.outputDir,
       devices: yaml.devices,
       rules: [],
@@ -45,8 +39,6 @@ class GLINTScreenshotConfig {
 
 /// Top-level entry point - registers screenshot capture tests.
 void glintScreenshots({
-  required String appName,
-  String? tagline,
   String outputDir = 'glint_screenshots',
   List<GLINTDevice> devices = GLINTDevices.playStoreDefaults,
   required List<GLINTRule> rules,
@@ -54,8 +46,6 @@ void glintScreenshots({
   String store = 'play',
 }) {
   final config = GLINTScreenshotConfig(
-    appName: appName,
-    tagline: tagline,
     outputDir: outputDir,
     devices: devices,
     rules: rules,
@@ -98,6 +88,7 @@ class GLINTRunner {
               textScale: device.textScale,
               theme: config.theme,
               pump: rule.pump,
+              device: device,
             );
 
             final platformDir = switch (device.platform) {
@@ -124,8 +115,6 @@ class GLINTRunner {
       try {
         final session = GLINTSession.fromDirectory(
           outputDir: config.outputDir,
-          appName: config.appName,
-          tagline: config.tagline,
           store: config.store,
         );
         await session.write(config.outputDir);

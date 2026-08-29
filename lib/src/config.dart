@@ -9,15 +9,11 @@ import 'devices.dart';
 /// Parsed glint.yaml configuration.
 class GLINTConfig {
   GLINTConfig({
-    required this.appName,
-    this.tagline,
     required this.outputDir,
     required this.devices,
     required this.store,
   });
 
-  final String appName;
-  final String? tagline;
   final String outputDir;
   final List<GLINTDevice> devices;
   final String store;
@@ -36,16 +32,12 @@ class GLINTConfig {
     final doc = loadYaml(yaml);
     if (doc is! Map) throw FormatException('Invalid glint.yaml');
 
-    final appName = doc['app_name'] as String? ?? 'MyApp';
-    final tagline = doc['tagline'] as String?;
     final outputDir = doc['output'] as String? ?? 'glint_screenshots';
     final store = doc['store'] as String? ?? 'play';
 
     final devices = _parseDevices(doc['devices'], rootDir: rootDir);
 
     return GLINTConfig(
-      appName: appName,
-      tagline: tagline,
       outputDir: outputDir,
       devices: devices,
       store: store,

@@ -98,16 +98,6 @@ Future<void> _discover(List<String> args) async {
   }
 
   final root = Directory.current.path;
-  final configPath = _findConfig();
-  var appName = 'MyApp';
-  String? tagline;
-  if (configPath != null) {
-    final yaml = loadYaml(File(configPath).readAsStringSync());
-    if (yaml is YamlMap) {
-      appName = yaml['app_name'] as String? ?? appName;
-      tagline = yaml['tagline'] as String?;
-    }
-  }
 
   print('Glint discover');
   print('  Root: $root');
@@ -146,8 +136,6 @@ Future<void> _discover(List<String> args) async {
 
   final codegen = ScreensTestCodegen(
     projectRoot: root,
-    appName: appName,
-    tagline: tagline,
   );
   final file = await codegen.mergeOrWrite(picks);
   print('\nWrote ${p.relative(file.path)}');
@@ -162,8 +150,6 @@ Future<void> _capture() async {
   }
 
   final yaml = loadYaml(File(configPath).readAsStringSync());
-  final appName = yaml['app_name'] as String? ?? 'MyApp';
-  final tagline = yaml['tagline'] as String?;
   final store = yaml['store'] as String? ?? 'play';
   final outputDir = yaml['output'] as String? ?? 'glint_screenshots';
   final devicesRaw = yaml['devices'];
@@ -179,7 +165,6 @@ Future<void> _capture() async {
 
   print('Glint');
   print('  Config:  $configPath');
-  print('  App:     $appName');
   print('  Store:   $store');
   print('  Devices: ${deviceNames.join(', ')}');
 
@@ -218,8 +203,6 @@ Future<void> _capture() async {
     try {
       final session = GLINTSession.fromDirectory(
         outputDir: outputDir,
-        appName: appName,
-        tagline: tagline,
         store: store,
       );
       await session.write(outputDir);
@@ -296,8 +279,6 @@ const _defaultConfig = '''# Glint configuration
 # Soft launch: capture ONE device for clean Glint Web frame mapping.
 # Add more devices later if you need size variants on disk.
 
-app_name: MyApp
-tagline: "Your app tagline"
 store: play  # play | ios
 
 # Presets (multi-device — session.json still picks a primary for Web):
@@ -326,7 +307,6 @@ import 'package:glint_capture/glint_capture.dart';
 /// Agent:  ask Cursor / Copilot to set up and capture screenshots
 void main() {
   glintScreenshots(
-    appName: 'MyApp',
     devices: [GLINTDevice.pixel9],
     rules: [
       GLINTRule.screen(
