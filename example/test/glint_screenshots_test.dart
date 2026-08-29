@@ -5,8 +5,6 @@ import '../lib/main.dart' as app;
 
 void main() {
   glintScreenshots(
-    appName: 'ExampleApp',
-    tagline: 'Screenshot automation made easy',
     devices: [
       GLINTDevice.pixel9,
       GLINTDevice.ipadPro11,

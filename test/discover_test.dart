@@ -52,7 +52,7 @@ class ProfileScreen extends StatelessWidget {
         sourcePath: 'lib/screens/home_screen.dart',
       ),
     ];
-    final codegen = ScreensTestCodegen(projectRoot: tmp.path, appName: 'Demo');
+    final codegen = ScreensTestCodegen(projectRoot: tmp.path);
     final src = codegen.generateFullSource(screens);
     expect(src, contains("import 'package:demo_app/screens/home_screen.dart';"));
     expect(src, contains('const HomeScreen()'));

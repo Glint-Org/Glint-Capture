@@ -20,15 +20,11 @@ void main() {
   group('GLINTSession', () {
     test('toJson matches Glint schema', () {
       final session = GLINTSession(
-        app: 'TestApp',
-        tagline: 'Hello',
         screens: ['android/pixel9/home.png', 'android/pixel9/profile.png'],
         store: 'play',
       );
 
       final json = session.toJson();
-      expect(json['app'], 'TestApp');
-      expect(json['tagline'], 'Hello');
       expect(json['screens'], hasLength(2));
       expect(json['store'], 'play');
       expect(json['version'], '1.0');
@@ -49,12 +45,9 @@ void main() {
 
       final session = GLINTSession.fromDirectory(
         outputDir: dir.path,
-        appName: 'ScanApp',
-        tagline: 'Tag',
         store: 'play',
       );
 
-      expect(session.app, 'ScanApp');
       expect(session.screens, [
         'android/pixel9/home.png',
         'android/pixel9/profile.png',
@@ -109,7 +102,6 @@ void main() {
   group('GLINTSession store keys', () {
     test('preserves canonical store ids in JSON', () {
       final session = GLINTSession(
-        app: 'Canonical',
         screens: ['android/pixel9/home.png'],
         store: 'play/phone',
       );
