@@ -17,7 +17,7 @@ class ScreenScanner {
   final String projectRoot;
   final String libRelative;
 
-  Future<List<DiscoveredScreen>> scan() async {
+  Future<List<DiscoveredScreen>> scan({int maxScreens = 8}) async {
     final packageName = _readPackageName();
     if (packageName == null) {
       throw StateError('No package name in pubspec.yaml under $projectRoot');
@@ -46,7 +46,7 @@ class ScreenScanner {
         if (_skipClass(className)) continue;
         final name = _slugFromClass(className);
         final hasConst = _hasConstConstructor(content, className);
-        final score = _heuristicScore(className, rel);
+        final score = _heuristicScore(className, rel, content);
         byClass.putIfAbsent(
           className,
           () => DiscoveredScreen(
@@ -86,6 +86,10 @@ class ScreenScanner {
         if (c != 0) return c;
         return a.name.compareTo(b.name);
       });
+    // Cap at maxScreens for soft launch (1 device, clean Web frame mapping)
+    if (list.length > maxScreens) {
+      return list.sublist(0, maxScreens);
+    }
     return list;
   }
 
@@ -143,9 +147,11 @@ class ScreenScanner {
     return re.hasMatch(source);
   }
 
-  static double _heuristicScore(String className, String relPath) {
+  static double _heuristicScore(String className, String relPath, String source) {
     final lower = className.toLowerCase();
     var score = 0.5;
+
+    // --- Name-based scoring ---
     const boost = [
       'home',
       'main',
@@ -157,9 +163,34 @@ class ScreenScanner {
       'welcome',
       'profile',
       'settings',
-      'empty',
       'library',
       'inbox',
+      'shop',
+      'store',
+      'cart',
+      'checkout',
+      'chat',
+      'inbox',
+      'messages',
+      'player',
+      'editor',
+      'gallery',
+      'map',
+      'calendar',
+      'tasks',
+      'notes',
+      'wallet',
+      'payments',
+      'notifications',
+      'search',
+      'discover',
+      'trending',
+      'popular',
+      'detail',
+      'view',
+      'show',
+      'list',
+      'index',
     ];
     const demote = [
       'debug',
@@ -174,14 +205,122 @@ class ScreenScanner {
       'loading',
       'error',
       'permission',
+      'forgot',
+      'reset',
+      'otp',
+      'verify',
+      '404',
+      'timeout',
+      'placeholder',
+      'empty',
+      'skeleton',
+      'shimmer',
     ];
     for (final b in boost) {
-      if (lower.contains(b)) score += 0.12;
+      if (lower.contains(b)) score += 0.1;
     }
     for (final d in demote) {
       if (lower.contains(d)) score -= 0.15;
     }
-    if (relPath.toLowerCase().contains('screen')) score += 0.05;
+
+    // --- Directory-based scoring ---
+    final pathLower = relPath.toLowerCase();
+    if (pathLower.contains('screen') || pathLower.contains('page') || pathLower.contains('view')) {
+      score += 0.08;
+    }
+    if (pathLower.contains('screens/') || pathLower.contains('pages/') || pathLower.contains('views/')) {
+      score += 0.05;
+    }
+    if (pathLower.contains('widgets/') || pathLower.contains('services/') ||
+        pathLower.contains('utils/') || pathLower.contains('providers/') ||
+        pathLower.contains('blocs/') || pathLower.contains('cubits/') ||
+        pathLower.contains('models/') || pathLower.contains('repositories/')) {
+      score -= 0.1;
+    }
+
+    // --- Widget-tree analysis (source code) ---
+    // Boost: rich visual widgets that look good in screenshots
+    const richWidgets = [
+      'ListView',
+      'GridView',
+      'SliverList',
+      'SliverGrid',
+      'CustomScrollView',
+      'PageView',
+      'TabBar',
+      'TabBarView',
+      'BottomNavigationBar',
+      'BottomAppBar',
+      'Card',
+      'Hero',
+      'AnimatedContainer',
+      'AnimatedBuilder',
+      'Stack',
+      'Positioned',
+      'ClipRRect',
+      'DecoratedBox',
+      'Gradient',
+      'LinearGradient',
+      'RadialGradient',
+      'NetworkImage',
+      'CachedNetworkImage',
+      'AssetImage',
+      'CircleAvatar',
+      'Chip',
+      'Badge',
+      'Avatar',
+      'CircularProgressIndicator', // only if inside a stack/scaffold body
+      'LinearProgressIndicator',
+    ];
+    var richCount = 0;
+    for (final w in richWidgets) {
+      if (source.contains(w)) richCount++;
+    }
+    // Each rich widget adds a small bonus, capped
+    score += (richCount * 0.03).clamp(0.0, 0.15);
+
+    // Boost: screens with images (marketing-worthy visual content)
+    if (source.contains('NetworkImage') || source.contains('CachedNetworkImage') ||
+        source.contains('AssetImage') || source.contains('Image.asset') ||
+        source.contains('Image.network')) {
+      score += 0.08;
+    }
+
+    // Boost: screens with cards/tiles (common in store screenshots)
+    if (source.contains('Card') || source.contains('ListTile') || source.contains('GridTile')) {
+      score += 0.05;
+    }
+
+    // Demote: mostly text, no visual richness
+    final hasOnlyText = source.contains('Center') &&
+        source.contains('Text(') &&
+        !source.contains('ListView') &&
+        !source.contains('GridView') &&
+        !source.contains('Stack') &&
+        !source.contains('Card');
+    if (hasOnlyText) score -= 0.12;
+
+    // Demote: auth/login screens that slipped through name check
+    if (source.contains('TextEditingController') &&
+        (lower.contains('email') || lower.contains('password') || lower.contains('phone'))) {
+      score -= 0.1;
+    }
+
+    // Demote: AlertDialog / popup-only screens
+    if (source.contains('AlertDialog') || source.contains('SimpleDialog')) {
+      score -= 0.08;
+    }
+
+    // Boost: Scaffold with AppBar (proper screen, not a widget)
+    if (source.contains('Scaffold') && source.contains('AppBar')) {
+      score += 0.05;
+    }
+
+    // Boost: screens with state (StatefulWidget = interactive, not static)
+    if (source.contains('StatefulWidget') || source.contains('State<Stateful')) {
+      score += 0.03;
+    }
+
     if (score < 0.1) score = 0.1;
     if (score > 0.95) score = 0.95;
     return score;
