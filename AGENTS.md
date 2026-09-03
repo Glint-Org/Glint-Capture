@@ -4,6 +4,8 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 
 **You (the agent) are the intelligence.** Developers should not configure Capture API keys.
 
+**Full workflow:** See `skills/glint/SKILL.md` in Glint-Org for the complete multi-repo pipeline.
+
 ## Primary commands
 
 - `glint init` — scaffold glint.yaml + test file + flutter_test_config.dart
