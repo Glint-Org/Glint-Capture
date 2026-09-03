@@ -33,7 +33,7 @@ class GLINTConfig {
     if (doc is! Map) throw FormatException('Invalid glint.yaml');
 
     final outputDir = doc['output'] as String? ?? 'glint_screenshots';
-    final store = doc['store'] as String? ?? 'play';
+    final store = _normalizeStore(doc['store'] as String? ?? 'play');
 
     final devices = _parseDevices(doc['devices'], rootDir: rootDir);
 
@@ -83,6 +83,17 @@ class GLINTConfig {
     return switch (value) {
       'ios' => GLINTPlatform.ios,
       _ => GLINTPlatform.android,
+    };
+  }
+
+  /// Normalize legacy store shortcuts to canonical Glint-Web format.
+  static String _normalizeStore(String raw) {
+    return switch (raw) {
+      'play' => 'play/phone',
+      'android' => 'play/phone',
+      'ios' => 'ios/iphone',
+      'ios-tablet' => 'ios/ipad',
+      _ => raw, // already canonical: play/phone, ios/iphone, etc.
     };
   }
 

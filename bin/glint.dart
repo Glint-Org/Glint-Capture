@@ -150,7 +150,7 @@ Future<void> _capture() async {
   }
 
   final yaml = loadYaml(File(configPath).readAsStringSync());
-  final store = yaml['store'] as String? ?? 'play';
+  final store = _normalizeStore(yaml['store'] as String? ?? 'play');
   final outputDir = yaml['output'] as String? ?? 'glint_screenshots';
   final devicesRaw = yaml['devices'];
 
@@ -176,6 +176,14 @@ Future<void> _capture() async {
 
   print('  Screens: ${p.relative(testFile)}');
   print('\nCapturing...');
+
+  // Ensure dependencies are resolved before running tests.
+  final pubGet = await Process.run('flutter', ['pub', 'get'], runInShell: true);
+  if (pubGet.exitCode != 0) {
+    stdout.write(pubGet.stdout);
+    stderr.write(pubGet.stderr);
+    print('\nWarning: flutter pub get failed, attempting capture anyway');
+  }
 
   final result = await Process.run('flutter', [
     'test',
@@ -273,13 +281,24 @@ Then: import glint_screenshots/ into Glint Web → templates → polish → ZIP.
 ''');
 }
 
+/// Normalize legacy store shortcuts to canonical Glint-Web format.
+String _normalizeStore(String raw) {
+  return switch (raw) {
+    'play' => 'play/phone',
+    'android' => 'play/phone',
+    'ios' => 'ios/iphone',
+    'ios-tablet' => 'ios/ipad',
+    _ => raw,
+  };
+}
+
 const _defaultConfig = '''# Glint configuration
 # Docs: https://github.com/Glint-Org/Glint-Capture
 #
 # Soft launch: capture ONE device for clean Glint Web frame mapping.
 # Add more devices later if you need size variants on disk.
 
-store: play  # play | ios
+store: play/phone  # play/phone | ios/iphone | ios/ipad
 
 # Presets (multi-device — session.json still picks a primary for Web):
 # devices: play_store
