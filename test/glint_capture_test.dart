@@ -21,12 +21,12 @@ void main() {
     test('toJson matches Glint schema', () {
       final session = GLINTSession(
         screens: ['android/pixel9/home.png', 'android/pixel9/profile.png'],
-        store: 'play',
+        store: 'play/phone',
       );
 
       final json = session.toJson();
       expect(json['screens'], hasLength(2));
-      expect(json['store'], 'play');
+      expect(json['store'], 'play/phone');
       expect(json['version'], '1.0');
       expect(json['exportedAt'], isNotNull);
     });
@@ -45,7 +45,7 @@ void main() {
 
       final session = GLINTSession.fromDirectory(
         outputDir: dir.path,
-        store: 'play',
+        store: 'play/phone',
       );
 
       expect(session.screens, [
