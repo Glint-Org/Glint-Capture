@@ -25,7 +25,7 @@ glint init
 
 ## How you capture (agent)
 
-1. Scan the app `lib/` for real screens (`*Screen` / `*Page`) — or run `glint discover --write` / `glint capture --auto`.
+1. Scan the app `lib/` for real screens (`*Screen` / `*Page`) - or run `glint discover --write` / `glint capture --auto`.
 2. Ensure `test/glint_screenshots_test.dart` uses **real** app widgets (fix generated builders if needed).
 3. Soft launch: **pixel9** only.
 4. Run `glint capture` (or `glint capture --auto`).

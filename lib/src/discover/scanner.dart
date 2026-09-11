@@ -7,7 +7,7 @@ import 'models.dart';
 
 /// Heuristic scan of `lib/` for Screen/Page widgets and common route patterns.
 ///
-/// No device / emulator — discovers real Dart types for `GLINTRule` builders.
+/// No device / emulator - discovers real Dart types for `GLINTRule` builders.
 class ScreenScanner {
   ScreenScanner({
     required this.projectRoot,
@@ -66,7 +66,7 @@ class ScreenScanner {
         final className = match.group(1)!;
         if (_skipClass(className)) continue;
         if (byClass.containsKey(className)) continue;
-        // May live in another file — still record with this import as hint;
+        // May live in another file - still record with this import as hint;
         // prefer later if we find the class definition.
         byClass[className] = DiscoveredScreen(
           name: _slugFromClass(className),

@@ -2,7 +2,7 @@ import 'dart:ui';
 
 /// Simulated device for screenshot capture.
 ///
-/// Curated set only — the devices developers use most for Play / App Store.
+/// Curated set only - the devices developers use most for Play / App Store.
 class GLINTDevice {
   const GLINTDevice({
     required this.name,
@@ -18,7 +18,7 @@ class GLINTDevice {
   final double textScale;
   final GLINTPlatform platform;
 
-  /// Pixel 9 — Play soft-launch default.
+  /// Pixel 9 - Play soft-launch default.
   static const pixel9 = GLINTDevice(
     name: 'pixel9',
     size: Size(412, 915),
@@ -26,7 +26,7 @@ class GLINTDevice {
     platform: GLINTPlatform.android,
   );
 
-  /// Galaxy S24 — Play Samsung flagship.
+  /// Galaxy S24 - Play Samsung flagship.
   static const galaxyS24 = GLINTDevice(
     name: 'galaxy_s24',
     size: Size(360, 780),
@@ -34,7 +34,7 @@ class GLINTDevice {
     platform: GLINTPlatform.android,
   );
 
-  /// iPhone 16 Pro Max — App Store 6.7" (→ 1290×2796).
+  /// iPhone 16 Pro Max - App Store 6.7" (→ 1290×2796).
   static const iphone16ProMax = GLINTDevice(
     name: 'iphone16_pro_max',
     size: Size(430, 932),
@@ -100,7 +100,7 @@ class GLINTDevice {
 
 enum GLINTPlatform { android, ios }
 
-/// Preset lists — only the curated devices above.
+/// Preset lists - only the curated devices above.
 abstract final class GLINTDevices {
   static const playStoreDefaults = [
     GLINTDevice.pixel9,

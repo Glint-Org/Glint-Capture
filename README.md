@@ -6,7 +6,7 @@ Part of the [Glint](https://github.com/Glint-Org) ecosystem. Soft-launch path: *
 
 ## Install
 
-**Git tag (soft launch — until pub.dev):**
+**Git tag (soft launch - until pub.dev):**
 
 ```yaml
 dev_dependencies:
@@ -52,8 +52,8 @@ dart pub global activate glint_capture
 ## Features
 
 - Screenshots from Flutter widget tests - no emulator required
-- **Manual rules** or **auto discover** (`glint discover` / `glint capture --auto`) — finds real `*Screen`/`*Page` widgets and writes builders
-- Works with **agentic IDEs** (Cursor / Copilot / Claude) — the agent crawls code and captures; no Glint API keys
+- **Manual rules** or **auto discover** (`glint discover` / `glint capture --auto`) - finds real `*Screen`/`*Page` widgets and writes builders
+- Works with **agentic IDEs** (Cursor / Copilot / Claude) - the agent crawls code and captures; no Glint API keys
 - Any widget tree you build: pages, dialogs, bottom sheets, drawers, custom painters
 - Full device pixel size (logical × DPR) with Roboto + MaterialIcons
 - Declarative `GLINTRule` API + template flows
@@ -65,7 +65,7 @@ dart pub global activate glint_capture
 |----|-----|
 | Pages / `Scaffold` | `builder: (_) => const HomeScreen()` |
 | Dialog / bottom sheet | Compose in the tree, **or** open with `pump:` (tap then settle) |
-| Drawer / snackbar / overlay | Same — build it or trigger it in `pump` |
+| Drawer / snackbar / overlay | Same - build it or trigger it in `pump` |
 | Custom fonts | Declare in host `pubspec` → loaded via `flutter_test_config.dart` |
 | Asset images | Yes if listed in `pubspec` |
 

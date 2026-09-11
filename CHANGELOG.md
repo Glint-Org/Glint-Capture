@@ -4,7 +4,7 @@
 
 - CLI: `glint discover [--write]` and `glint capture --auto`
 - Scans `lib/` for `*Screen` / `*Page` widgets and generates real `GLINTRule` builders
-- Agentic IDE workflow (Cursor / Copilot) — no developer API keys for Capture
+- Agentic IDE workflow (Cursor / Copilot) - no developer API keys for Capture
 
 ## 0.1.0
 

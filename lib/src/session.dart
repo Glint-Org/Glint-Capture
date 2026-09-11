@@ -120,7 +120,7 @@ class GLINTSession {
       }
     }
 
-    // Curated devices only — prefer store-appropriate primary.
+    // Curated devices only - prefer store-appropriate primary.
     final isIpad = store == 'ios-tablet' || store == 'ios/ipad';
     final preferredDevices = (platformHint == 'ios')
         ? (isIpad

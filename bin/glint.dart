@@ -16,7 +16,7 @@ import 'package:yaml/yaml.dart';
 ///   glint capture [--auto]
 ///
 /// Agents (Cursor / Copilot / Claude): discover screens, write real rules,
-/// run capture — no developer API keys required.
+/// run capture - no developer API keys required.
 Future<void> main(List<String> args) async {
   if (args.isEmpty) {
     _printHelp();
@@ -274,7 +274,7 @@ Two ways for developers:
   Auto     glint capture --auto
 
 Agentic IDEs (Cursor / Copilot / Claude Code):
-  Ask the agent to capture store screenshots — it uses discover/rules + capture.
+  Ask the agent to capture store screenshots - it uses discover/rules + capture.
   No API keys to configure in Glint.
 
 Then: import glint_screenshots/ into Glint Web → templates → polish → ZIP.
@@ -300,11 +300,11 @@ const _defaultConfig = '''# Glint configuration
 
 store: play/phone  # play/phone | ios/iphone | ios/ipad
 
-# Presets (multi-device — session.json still picks a primary for Web):
+# Presets (multi-device - session.json still picks a primary for Web):
 # devices: play_store
 # devices: app_store
 
-# Soft-launch default — Pixel 9 (premium Play phone):
+# Soft-launch default - Pixel 9 (premium Play phone):
 devices:
   - name: pixel9
     width: 412

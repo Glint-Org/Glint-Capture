@@ -23,7 +23,7 @@ void main() {
         name: 'settings',
         builder: (context) => const app.SettingsScreen(),
       ),
-      // Overlay UIs work too — compose dialog / sheet on top of a screen
+      // Overlay UIs work too - compose dialog / sheet on top of a screen
       GLINTRule.screen(
         name: 'confirm_dialog',
         builder: (context) => Stack(

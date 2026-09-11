@@ -1,4 +1,4 @@
-# Glint-Capture — Agent Instructions
+# Glint-Capture - Agent Instructions
 
 Capture real Flutter UI into store-sized PNGs and `session.json`.
 
@@ -8,9 +8,9 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 
 ## Primary commands
 
-- `glint init` — scaffold glint.yaml + test file + flutter_test_config.dart
-- `glint discover [--write] [--max N]` — scan `lib/` for best marketing screens (no device)
-- `glint capture [--auto]` — widget-test screenshots (`--auto` = discover + write + capture)
+- `glint init` - scaffold glint.yaml + test file + flutter_test_config.dart
+- `glint discover [--write] [--max N]` - scan `lib/` for best marketing screens (no device)
+- `glint capture [--auto]` - widget-test screenshots (`--auto` = discover + write + capture)
 
 ## Outputs
 
@@ -19,11 +19,11 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 
 ## Rules
 
-1. Use real app widgets/screens only — never invent UI
+1. Use real app widgets/screens only - never invent UI
 2. Keep rules deterministic and CI-friendly
 3. Soft launch: prefer **one device** (pixel9) so `session.json` maps cleanly onto Web frames
 4. Preserve screen order within that device
-5. Always ship `test/flutter_test_config.dart` (Roboto + MaterialIcons) — never Ahem
+5. Always ship `test/flutter_test_config.dart` (Roboto + MaterialIcons) - never Ahem
 6. Capture any Flutter widget tree (pages, dialogs, sheets); use `pump:` to open modals
 7. Never invent UI pixels; never ask the user for LLM API keys for Capture
 
@@ -33,10 +33,10 @@ Capture real Flutter UI into store-sized PNGs and `session.json`.
 
 Do NOT ask which screens. Use auto-discovery:
 
-1. `glint discover --write` — scans lib/ for *Screen/*Page widgets, scores by marketing value, writes top 8
-2. Review the discovered rules — verify they look like real user-facing screens
+1. `glint discover --write` - scans lib/ for *Screen/*Page widgets, scores by marketing value, writes top 8
+2. Review the discovered rules - verify they look like real user-facing screens
 3. If any screen looks wrong (login, debug, empty, permission), edit the test file to remove it
-4. `glint capture` — captures all rules at store sizes
+4. `glint capture` - captures all rules at store sizes
 5. Tell developer: output is in `glint_screenshots/`, import into Glint Web for templates
 
 ### Developer says: "capture HomeScreen, ProfileScreen, SettingsScreen"
@@ -51,7 +51,7 @@ Do NOT run discover. Write rules directly:
 ### Developer says: "capture these screens but skip onboarding"
 
 1. Run `glint discover --write` first (if no rules exist yet)
-2. Edit `test/glint_screenshots_test.dart` — remove onboarding/splash rules
+2. Edit `test/glint_screenshots_test.dart` - remove onboarding/splash rules
 3. `glint capture`
 
 ### Developer says: "capture with multiple devices"
